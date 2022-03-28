@@ -6,8 +6,10 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import type {Node} from 'react';
+import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+
 import {
   SafeAreaView,
   ScrollView,
@@ -16,6 +18,7 @@ import {
   Text,
   useColorScheme,
   View,
+  TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -26,7 +29,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const Section = ({children, title}): Node => {
+const Section = ({ children, title }) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -52,8 +55,41 @@ const Section = ({children, title}): Node => {
   );
 };
 
-const App: () => Node = () => {
+const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isConnected, setConnected] = useState(false);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const thesocket = io('ws://10.0.0.5:3001', {
+      transports: ['websocket'],
+    });
+
+    thesocket.on('connect', () => {
+      setConnected(true);
+      setSocket(thesocket);
+    });
+
+    thesocket.on('disconnect', () => {
+      setConnected(false);
+      setSocket(null);
+    });
+  }, []);
+
+  const handlePress = () => {
+    if (isConnected && socket) {
+
+      socket.emit('sms-sent', 'mariam is a cheater');
+    } else {
+      alert('no socket connection')
+    }
+  }
+
+  if (socket) {
+    socket.on('from-server', (data) => {
+      console.log(data);
+    })
+  }
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -70,20 +106,11 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          <Text>Connected:{isConnected? 'Yes': 'No'}</Text>
+
+          <TouchableOpacity style={{ padding: 10, backgroundColor: 'blue' }} onPress={handlePress}>
+            <Text>Click</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
