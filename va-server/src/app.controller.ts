@@ -39,7 +39,6 @@ export class AppController {
   }
 
 
-
   @Get('bot')
   async testBot() {
     return this.chatbotService.testBot();

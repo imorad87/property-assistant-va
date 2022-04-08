@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Repository } from 'typeorm';
 import { CSVProcessorService } from './csv-processor/csv-processor.service';
-import { CSVFileUploadStatus } from './entities/csv-file-upload-status.entity';
+import { Campaign } from './entities/campaign.entity';
 
 @Injectable()
 @WebSocketGateway({
@@ -18,7 +19,7 @@ export class AppService {
   server: Server;
 
 
-  constructor(@InjectRepository(CSVFileUploadStatus) private csvFileRepo: Repository<CSVFileUploadStatus>, private csvProcessorService: CSVProcessorService) { }
+  constructor(@InjectRepository(Campaign) private csvFileRepo: Repository<Campaign>, private csvProcessorService: CSVProcessorService) { }
 
   sendFile(file: Express.Multer.File) {
     this.server.emit('from-server', file);
@@ -45,5 +46,8 @@ export class AppService {
 
     return savedFile;
   }
+
+
+
 
 }

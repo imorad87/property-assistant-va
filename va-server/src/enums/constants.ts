@@ -6,10 +6,11 @@ export enum Constants {
     INCOMING = 'incoming',
     RECEIVED = 'received',
     SCHEDULED = 'scheduled',
+    QUEUED = 'queued',
 
     // files specific
     PARSING = 'parsing',
-    COMPLETED= 'completed',
+    COMPLETED = 'completed',
 
 
     // phone number specific

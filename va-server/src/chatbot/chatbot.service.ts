@@ -4,13 +4,12 @@ import { dockStart } from '@nlpjs/basic'
 export class ChatbotService {
 
     private bot;
-    
+
     constructor() {
         (
             async () => {
                 const dock = await dockStart();
                 const nlp = dock.get('nlp');
-                await nlp.train();
                 this.bot = nlp;
             }
         )();

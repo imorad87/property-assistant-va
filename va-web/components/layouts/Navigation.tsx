@@ -40,9 +40,9 @@ const Navigation = () => {
                         </div>
                         <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                             <NavLink
-                                href="/leads"
-                                active={router.pathname === '/leads'}>
-                                Leads
+                                href="/contacts"
+                                active={router.pathname === '/contacts'}>
+                                Contacts
                             </NavLink>
                         </div>
 

@@ -1,0 +1,139 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type SMSMessage {
+  id: Int!
+  body: String!
+  status: String!
+  type: String!
+  phone_number: PhoneNumber!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+}
+
+"""
+`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+type PhoneNumber {
+  id: Int!
+  number: String!
+  active: Boolean!
+  remark: String!
+  contact: Contact!
+  messages: [SMSMessage!]!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+}
+
+type Contact {
+  id: Int!
+  name: String!
+  active: Boolean!
+  status: String!
+  phone_numbers: [PhoneNumber!]!
+  campaign: Campaign!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+}
+
+type Campaign {
+  id: Int!
+  title: String!
+  leads_count: Int!
+  phone_numbers_count: Int!
+  active: Boolean!
+  parsing_status: String!
+  file_path: String!
+  failed_count: Int!
+  success_count: Int!
+  contacts: [Contact!]!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+}
+
+type ContactsStats {
+  allContactsCount: Int!
+  leadsCount: Int!
+  convertedCount: Int!
+  pausedCount: Int!
+  activeCount: Int!
+}
+
+type Query {
+  getAllContacts: [Contact!]!
+  findContact(id: Int!): Contact!
+  contactsStats: ContactsStats!
+  getAllCampaigns: [Campaign!]!
+  getCampaign(id: Int!): Campaign!
+  getAllPhoneNumbers: [PhoneNumber!]!
+  getPhoneNumber(id: Int!): PhoneNumber!
+  getAllMessages: [SMSMessage!]!
+  findMessage(id: Int!): SMSMessage!
+}
+
+type Mutation {
+  createContact(input: IContactCreateObject!): Contact!
+  updateContact(input: IContactUpdateObject!): Contact!
+  removeContact(id: Int!): Contact!
+  createCampaign(input: ICampaignCreateObject!): Campaign!
+  updateCampaign(input: ICampaignUpdateObject!): Campaign!
+  remove(id: Int!): Boolean!
+  create(createPhoneNumberInput: IPhoneNumberCreateObject!): PhoneNumber!
+  updatePhoneNumber(updatePhoneNumberInput: IPhoneNumberUpdateObject!): PhoneNumber!
+  createMessage(input: ISMSMessageCreateObject!): SMSMessage!
+  updateMessage(input: ISMSMessageUpdateObject!): SMSMessage!
+  removeMessage(id: Int!): SMSMessage!
+}
+
+input IContactCreateObject {
+  id: Int
+  name: String!
+  phone_numbers: [String!]!
+  active: Boolean
+  status: String
+  campaign_id: Int
+}
+
+input IContactUpdateObject {
+  id: Int!
+}
+
+input ICampaignCreateObject {
+  title: String!
+  phone_numbers: [String!]!
+}
+
+input ICampaignUpdateObject {
+  id: Int!
+}
+
+input IPhoneNumberCreateObject {
+  number: String!
+  contact_id: Int
+}
+
+input IPhoneNumberUpdateObject {
+  id: Int!
+  number: String
+  active: Boolean
+  remark: String
+}
+
+input ISMSMessageCreateObject {
+  id: Int!
+  body: String!
+  status: String!
+  phone_number: Int!
+  type: String!
+}
+
+input ISMSMessageUpdateObject {
+  id: Int!
+  body: String!
+  status: String!
+  phone_number: Int!
+  type: String!
+}
