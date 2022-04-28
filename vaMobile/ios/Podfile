@@ -12,6 +12,10 @@ target 'vaMobile' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-job-queue', :path => '../node_modules/react-native-job-queue'
+
+  pod 'RealmJS', :path => '../node_modules/realm'
+
   target 'vaMobileTests' do
     inherit! :complete
     # Pods for testing

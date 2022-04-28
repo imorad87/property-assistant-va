@@ -1,0 +1,1004 @@
+[
+  {
+    "input": {
+      "Who": 1,
+      "is": 1,
+      "this": 1
+    },
+    "output": {
+      "identity": 1
+    }
+  },
+  {
+    "input": {
+      "Who": 1,
+      "are": 1,
+      "you": 1
+    },
+    "output": {
+      "identity": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "are": 1,
+      "you": 1
+    },
+    "output": {
+      "identity": 1
+    }
+  },
+  {
+    "input": {
+      "why": 1,
+      "did": 1,
+      "you": 1,
+      "send": 1,
+      "to": 1,
+      "me": 1
+    },
+    "output": {
+      "identity": 1
+    }
+  },
+  {
+    "input": {
+      "how": 1,
+      "did": 1,
+      "you": 1,
+      "find": 1,
+      "me": 1
+    },
+    "output": {
+      "wondring.discovery": 1
+    }
+  },
+  {
+    "input": {
+      "how": 1,
+      "did": 1,
+      "you": 1,
+      "get": 1,
+      "my": 1,
+      "contact": 1,
+      "info": 1
+    },
+    "output": {
+      "wondring.discovery": 1
+    }
+  },
+  {
+    "input": {
+      "how": 1,
+      "did": 1,
+      "you": 1,
+      "get": 1,
+      "my": 1,
+      "number": 1
+    },
+    "output": {
+      "wondring.discovery": 1
+    }
+  },
+  {
+    "input": {
+      "Where": 1,
+      "did": 1,
+      "you": 1,
+      "get": 1,
+      "my": 1,
+      "number": 1
+    },
+    "output": {
+      "wondring.discovery": 1
+    }
+  },
+  {
+    "input": {
+      "how": 1,
+      "did": 1,
+      "you": 1,
+      "get": 1,
+      "my": 1,
+      "information": 1
+    },
+    "output": {
+      "wondring.discovery": 1
+    }
+  },
+  {
+    "input": {
+      "How": 1,
+      "much": 1,
+      "are": 1,
+      "you": 1,
+      "offering": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "offer": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "depends": 1,
+      "on": 1,
+      "your": 1,
+      "offer": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "depends": 1,
+      "on": 1,
+      "the": 1,
+      "offer": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "whats": 1,
+      "your": 1,
+      "offer": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "how": 1,
+      "much": 1,
+      "are": 1,
+      "you": 1,
+      "going": 1,
+      "to": 1,
+      "give": 1,
+      "me": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "will": 1,
+      "you": 1,
+      "pay": 1
+    },
+    "output": {
+      "wondring.offer": 1
+    }
+  },
+  {
+    "input": {
+      "wrong": 1,
+      "number": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "wrong": 1,
+      "person": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "thats": 1,
+      "not": 1,
+      "me": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "I": 1,
+      "dont": 1,
+      "own": 1,
+      "any": 1,
+      "properties": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "thats": 1,
+      "not": 1,
+      "my": 1,
+      "property": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "thats": 1,
+      "not": 1,
+      "my": 1,
+      "address": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "thats": 1,
+      "not": 1,
+      "my": 1,
+      "house": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "thats": 1,
+      "not": 1,
+      "my": 1,
+      "land": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "you": 1,
+      "have": 1,
+      "the": 1,
+      "wrong": 1,
+      "number": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "stop": 1,
+      "texting": 1,
+      "me": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "fuck": 1,
+      "off": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "fuck": 1,
+      "you": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "delete": 1,
+      "me": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "remove": 1,
+      "me": 1,
+      "from": 1,
+      "your": 1,
+      "list": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "remove": 1,
+      "me": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "dont": 1,
+      "contact": 1,
+      "me": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "stop": 1,
+      "calling": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "stop": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "sold": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "it": 1,
+      "already": 1,
+      "sold": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "its": 1,
+      "gone": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "too": 1,
+      "late": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "already": 1,
+      "gone": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "dont": 1,
+      "own": 1,
+      "it": 1,
+      "anymore": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "go": 1,
+      "away": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "no": 1
+    },
+    "output": {
+      "negative": 1
+    }
+  },
+  {
+    "input": {
+      "Im": 1,
+      "interested": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "do": 1,
+      "you": 1,
+      "need": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "call": 1,
+      "me": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "do": 1,
+      "you": 1,
+      "need": 1,
+      "to": 1,
+      "know": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "not": 1,
+      "for": 1,
+      "sale": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "yes": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "yes": 1,
+      "he": 1,
+      "can": 1,
+      "call": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "im": 1,
+      "ready": 1,
+      "for": 1,
+      "a call": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "yes": 1,
+      "we": 1,
+      "can": 1,
+      "talk": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "we": 1,
+      "can": 1,
+      "talk": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "i": 1,
+      "can": 1,
+      "talk": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "i": 1,
+      "can": 1,
+      "speak": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "i": 1,
+      "get": 1,
+      "off": 1,
+      "work:1, at": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "yes": 1,
+      "we": 1,
+      "can": 1,
+      "speak": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "I": 1,
+      "am": 1,
+      "available": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "when": 1,
+      "can": 1,
+      "he": 1,
+      "call": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "when": 1,
+      "can": 1,
+      "we": 1,
+      "talk": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "when": 1,
+      "can": 1,
+      "we": 1,
+      "speak": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "time": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "i": 1,
+      "have": 1,
+      "no": 1,
+      "equity": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "it": 1,
+      "is": 1,
+      "in": 1,
+      "bad": 1,
+      "shape": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "house": 1,
+      "is": 1,
+      "in": 1,
+      "bad": 1,
+      "shape": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "bad": 1,
+      "damage": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "i": 1,
+      "owe": 1,
+      "too": 1,
+      "much": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "foreclosure": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "auction": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "its": 1,
+      "going": 1,
+      "to": 1,
+      "auction": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "its": 1,
+      "under": 1,
+      "foreclosure": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "liens": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "fighting": 1,
+      "with": 1,
+      "the": 1,
+      "bank": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "okay": 1,
+      "yes": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "okay": 1,
+      "call": 1,
+      "me": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "okay": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "help": 1,
+      "me": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "help": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "short": 1,
+      "sale": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "can": 1,
+      "you": 1,
+      "help": 1
+    },
+    "output": {
+      "positive": 1
+    }
+  },
+  {
+    "input": {
+      "money": 1
+    },
+    "output": {
+      "wondring.cash": 1
+    }
+  },
+  {
+    "input": {
+      "cash": 1,
+      "only": 1
+    },
+    "output": {
+      "wondring.cash": 1
+    }
+  },
+  {
+    "input": {
+      "cash": 1
+    },
+    "output": {
+      "wondring.cash": 1
+    }
+  },
+  {
+    "input": {
+      "If": 1,
+      "you": 1,
+      "cant": 1,
+      "offer": 1,
+      "any": 1,
+      "number": 1,
+      "dont": 1,
+      "waste": 1,
+      "my": 1,
+      "time": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "wont": 1,
+      "accept": 1,
+      "less": 1,
+      "than": 1,
+      "any": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "what": 1,
+      "is": 1,
+      "your": 1,
+      "price": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "lookingf": 1,
+      "for": 1,
+      "any": 1,
+      "price": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "say": 1,
+      "a": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "give": 1,
+      "me": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "has": 1,
+      "to": 1,
+      "be": 1,
+      "at": 1,
+      "least": 1,
+      "any number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "im": 1,
+      "looking": 1,
+      "for": 1,
+      "any": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "I": 1,
+      "am": 1,
+      "looking": 1,
+      "for": 1,
+      "any": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "looking": 1,
+      "for": 1,
+      "any": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "dont": 1,
+      "waste": 1,
+      "my": 1,
+      "time": 1,
+      "unless": 1,
+      "you": 1,
+      "give": 1,
+      "me": 1,
+      "any": 1,
+      "number": 1
+    },
+    "output": {
+      "postive.specific.number": 1
+    }
+  },
+  {
+    "input": {
+      "situation": 1
+    },
+    "output": {
+      "situation": 1
+    }
+  },
+  {
+    "input": {
+      "i'm": 1,
+      "reporting": 1,
+      "you": 1
+    },
+    "output": {
+      "angry": 1
+    }
+  },
+  {
+    "input": {
+      "will": 1,
+      "repor": 1,
+      "you": 1
+    },
+    "output": {
+      "angry": 1
+    }
+  }
+]

@@ -1,29 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { SMSMessagesService } from '../sms-messages/sms-messages.service';
-import { isEmpty } from 'lodash';
-import { WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import Bull, { Queue } from 'bull';
+import { SMSMessage } from 'src/entities/sms-message.entity';
 import { MobileAppEventsGateway } from 'src/mobile-app-events/mobile-app-events.gateway';
+import { SMSMessagesService } from '../sms-messages/sms-messages.service';
+
 @Injectable()
 export class ScheduledTasksService {
 
-    @WebSocketServer()
-    private server: Server;
+    private logger = new Logger(ScheduledTasksService.name);
 
-
-    constructor(private scheduleRegistry: SchedulerRegistry, private messageService: SMSMessagesService, private mae: MobileAppEventsGateway) { }
-
+    constructor(
+        @InjectQueue('mobile') private readonly mobileQueue: Queue,
+        private messageService: SMSMessagesService,
+        private scheduleRegistry: SchedulerRegistry,
+        private mae: MobileAppEventsGateway
+    ) { }
 
     @Cron(CronExpression.EVERY_5_SECONDS, { name: 'getScheduledMessages' })
     async getScheduledMessages() {
+
         const scheduledMessages = await this.messageService.getScheduledMessages();
 
-        this.mae.sendSMS(scheduledMessages);
+        this.logger.log(`Numbers Of Messages To Send: ${scheduledMessages.length}`);
 
-        if (!isEmpty(scheduledMessages)) {
-            // TODO: add messages to the queue to be sent the mobile app
+        const jobs = [];
 
+        for (const message of scheduledMessages) {
+            const match = (await this.mobileQueue.getJobs(['paused', 'active', 'delayed', 'waiting'])).find(job => {
+                const jobData: SMSMessage = job.data;
+                return jobData.id == message.id;
+            });
+            
+            if (match) {
+                continue;
+            }
+            jobs.push({
+                data: message,
+                name: 'new-message',
+            });
         }
+
+        await this.mobileQueue.addBulk(jobs);
     }
 }

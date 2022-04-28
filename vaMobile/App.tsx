@@ -6,54 +6,28 @@
  * @flow strict-local
  */
 
-import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
-
-
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
+  Text, TouchableOpacity, useColorScheme,
   View,
-  TouchableOpacity,
+  PermissionsAndroid,
 } from 'react-native';
 
+import SmsAndroid from 'react-native-get-sms-android';
+
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
+  Colors, Header
 } from 'react-native/Libraries/NewAppScreen';
 
-const Section = ({ children, title }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+import { io } from 'socket.io-client';
+
+import SmsListener from 'react-native-android-sms-listener'
+
+
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -74,26 +48,112 @@ const App = () => {
       setConnected(false);
       setSocket(null);
     });
+
+    const readPermissions = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_SMS,
+          {
+            title: "Property VA",
+            message:
+              "READ SMS?",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("Can Read SMS");
+        } else {
+          console.log("Read SMS permission denied");
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+    const requestSendSMSPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: "Property VA",
+            message:
+              "Send SMS?",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("Can SEND_SMS");
+        } else {
+          console.log("SEND_SMS permission denied");
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+
+
+    };
+
+    readPermissions();
+    requestSendSMSPermission();
+
+   
+      try {
+
+        SmsListener.addListener(message => {
+          console.info(message)
+        });
+
+        console.log("🚀 ~ file: App.tsx ~ line 115 ~ startListener ~ mAdded listener");
+      } catch (error) {
+        console.log(JSON.stringify(error));
+      }
+
+
+
   }, []);
 
-  const handlePress = () => {
-    if (isConnected && socket) {
 
-      socket.emit('sms-sent', 'mariam is a cheater');
-    } else {
-      alert('no socket connection')
-    }
-  }
+
 
   if (socket) {
-    socket.on('from-server', (data) => {
+    socket.on('sms-send-event', (data) => {
+      SmsAndroid.autoSend(
+        data.number,
+        data.msg,
+        (fail) => {
+          console.log('Failed with this error: ' + fail);
+        },
+        (success) => {
+        },
+      );
       console.log(data);
     })
   }
 
+
+
+
+  const sendMessage = () => {
+    SmsAndroid.autoSend(
+      '01147799399',
+      "hello",
+      (fail) => {
+        console.log('Failed with this error: ' + fail);
+      },
+      (success) => {
+        // console.log(success)
+      },
+    );
+  };
+
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  }; ``
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -106,10 +166,13 @@ const App = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Text>Connected:{isConnected? 'Yes': 'No'}</Text>
-
-          <TouchableOpacity style={{ padding: 10, backgroundColor: 'blue' }} onPress={handlePress}>
+          <Text>Connected:{isConnected ? 'Yes' : 'No'}</Text>
+          {/* 
+          <TouchableOpacity style={{ padding: 10, backgroundColor: 'blue', marginBottom: 10, }} onPress={requestCameraPermission}>
             <Text>Click</Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={{ padding: 10, backgroundColor: 'blue' }} onPress={sendMessage}>
+            <Text>Send</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

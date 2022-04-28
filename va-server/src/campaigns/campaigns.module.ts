@@ -6,6 +6,7 @@ import { Campaign } from '../entities/campaign.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Campaign])],
-  providers: [CampaignsService, CampaignsResolver]
+  providers: [CampaignsService, CampaignsResolver],
+  exports: [CampaignsService]
 })
 export class CampaignsModule { }

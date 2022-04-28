@@ -19,7 +19,7 @@ export class PhoneNumber {
     @Column({ default: true })
     active: boolean;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ nullable: true })
     remark: string;
 
@@ -29,7 +29,7 @@ export class PhoneNumber {
     contact: Contact
 
     @Field(type => [SMSMessage]!)
-    @OneToMany(() => SMSMessage, smsMessage => smsMessage.phone_number)
+    @OneToMany(() => SMSMessage, smsMessage => smsMessage.phone_number, { cascade: true })
     messages: SMSMessage[];
 
     @Field(type => GraphQLTimestamp)

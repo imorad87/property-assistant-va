@@ -13,7 +13,7 @@ export class PhoneNumbersResolver {
 
     constructor(private readonly phoneNumbersService: PhoneNumbersService) { }
 
-    @Mutation((returns) => PhoneNumber)
+    @Mutation((returns) => PhoneNumber, {name:'createPhoneNumber'})
     async create(@Args('createPhoneNumberInput') createInput: IPhoneNumberCreateObject): Promise<PhoneNumber> {
         return await this.phoneNumbersService.create(createInput);
     }
@@ -33,17 +33,18 @@ export class PhoneNumbersResolver {
         return await this.phoneNumbersService.update(updateInput);
     }
 
-    @Mutation((returns) => Boolean)
+    @Mutation((returns) => Boolean, { name: 'removePhoneNumber' })
     async remove(@Args('id', { type: () => Int }) id: number) {
         return await this.phoneNumbersService.delete(id);
     }
 
-    @ResolveField('contact', returns => Contact!)
-    async getContact(@Parent() contact: Contact){
+    @ResolveField('contact', returns => Contact!, { name: 'getContact' })
+    async getContact(@Parent() contact: Contact) {
         return await this.phoneNumbersService.getContact(contact.id);
     }
-    @ResolveField('messages', returns => [SMSMessage]!)
-    async getMessages(@Parent() number: PhoneNumber){
+
+    @ResolveField('messages', returns => [SMSMessage]!, { name: 'getMessages' })
+    async getMessages(@Parent() number: PhoneNumber) {
         return await this.phoneNumbersService.getMessages(number.id);
     }
 }

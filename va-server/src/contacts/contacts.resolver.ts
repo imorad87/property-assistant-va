@@ -1,14 +1,13 @@
 import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { Campaign } from 'src/entities/campaign.entity';
-import { PhoneNumber } from 'src/entities/phone-number.entity';
+import { Campaign } from '../entities/campaign.entity';
+import { PhoneNumber } from '../entities/phone-number.entity';
+import { Property } from '../entities/property.entity';
 import { Contact } from '../entities/contact.entity';
 import { ContactsStats, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 import { ContactsService } from './contacts.service';
 
 @Resolver(of => Contact)
 export class ContactsResolver {
-
-
 
     constructor(private readonly contactsService: ContactsService) { }
 
@@ -23,7 +22,7 @@ export class ContactsResolver {
     }
 
     @Query(() => Contact, { name: 'findContact' })
-    async findOne(@Args('id', { type: () => Int }) id: number) {
+    async findOne(@Args('id', { type: () => Int! }) id: number) {
         return await this.contactsService.findOne(id);
     }
 
@@ -37,7 +36,27 @@ export class ContactsResolver {
         return await this.contactsService.update(updateContactInput);
     }
 
-    @Mutation(() => Contact, { name: 'removeContact' })
+    @Mutation(() => Boolean, { name: 'activateAllNumbers' })
+    async activateAllNumbers(@Args({ name: 'id', type: () => Int! }) id: number) {
+        return await this.contactsService.activateAllNumbers(id);
+    }
+
+    @Mutation(() => Boolean, { name: 'deactivateAllNumbers' })
+    async deactivateAllNumbers(@Args({ name: 'id', type: () => Int! }) id: number) {
+        return await this.contactsService.deactivateAllNumbers(id);
+    }
+
+    @Mutation(() => Boolean, { name: 'activateAllMessages' })
+    async activateAllMessages(@Args({ name: 'id', type: () => Int! }) id: number) {
+        return await this.contactsService.activateAllMessages(id);
+    }
+
+    @Mutation(() => Boolean, { name: 'deactivateAllMessages' })
+    async deactivateAllMessages(@Args({ name: 'id', type: () => Int! }) id: number) {
+        return await this.contactsService.deactivateAllMessages(id);
+    }
+
+    @Mutation(() => Boolean, { name: 'removeContact' })
     async remove(@Args('id', { type: () => Int }) id: number) {
         return await this.contactsService.remove(id);
     }
@@ -50,5 +69,10 @@ export class ContactsResolver {
     @ResolveField('campaign', returns => Campaign!)
     async getCampaign(@Parent() contact: Contact) {
         return await this.contactsService.getCampaign(contact.id);
+    }
+
+    @ResolveField('property', returns => Property!)
+    async getProperty(@Parent() contact: Contact) {
+        return await this.contactsService.getProperty(contact.id);
     }
 }

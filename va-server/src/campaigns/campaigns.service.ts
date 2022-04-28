@@ -12,20 +12,19 @@ export class CampaignsService {
     constructor(@InjectRepository(Campaign) private campaignsRepo: Repository<Campaign>) { }
 
     async create(campaign: ICampaignCreateObject): Promise<Campaign> {
-        try {
-            const savedCampaign = await this.campaignsRepo.save(this.campaignsRepo.create(campaign));
-            this.logger.log(`New contact created name: ${savedCampaign.title} id: ${savedCampaign.id}`);
-            return savedCampaign;
-        } catch (e) {
-            this.logger.error({ message: 'Error creating new campaign', error: e.message });
-        }
+
+        const savedCampaign = await this.campaignsRepo.save(this.campaignsRepo.create(campaign));
+        return savedCampaign;
+
     }
 
     async delete(id: number) {
         const campaign = await this.findOne(id);
+
         if (!campaign) {
-            throw new Error(`Campaign with id${id} doesn't exist`);
+            throw new Error(`Campaign with id ${id} doesn't exist`);
         }
+
         await this.campaignsRepo.delete(id);
         return true;
     }
@@ -38,8 +37,41 @@ export class CampaignsService {
         return await this.campaignsRepo.find();
     }
 
+    async updateParsingStatus(status: string, id: number) {
+        return await this.campaignsRepo
+            .createQueryBuilder('campaign')
+            .update({ parsing_status: status })
+            .where("campaign.id = :id", { id })
+            .execute()
+    }
+
+    async incrementTotalRecords(id: number) {
+        return await this.campaignsRepo.increment({
+            id
+        }, 'total_records', 1);
+    }
+
+    async incrementFailedCount(id: number) {
+        return await this.campaignsRepo.increment({
+            id
+        }, 'failed_count', 1);
+    }
+
+    async incrementSuccessCount(id: number) {
+        return await this.campaignsRepo.increment({
+            id
+        }, 'success_count', 1);
+    }
+
+    async incrementDuplicatesCount(id: number) {
+        return await this.campaignsRepo.increment({
+            id
+        }, 'duplicates_count', 1);
+    }
+
     async update(campaign: ICampaignUpdateObject) {
-        return await this.campaignsRepo.save(campaign);
+        const savedCampaign = await this.campaignsRepo.save(campaign);
+        return this.campaignsRepo.findOne(campaign.id);
     }
 
     async getContacts(id: number) {

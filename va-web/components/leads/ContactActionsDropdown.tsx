@@ -4,16 +4,16 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Link from 'next/link';
-
-const options = [
-    'Open',
-    'Pause',
-    'Delete',
-];
+import { useMutation } from '@apollo/client';
+import { UPDATE_CONTACT_MUTATION } from '../../lib/mutations';
 
 const ITEM_HEIGHT = 48;
 
 export default function ContactActionsDropdown({ active, id }) {
+
+
+
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const open = Boolean(anchorEl);

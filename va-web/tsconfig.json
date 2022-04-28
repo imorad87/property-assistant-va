@@ -16,6 +16,6 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "styles/va-styles.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "styles/va-styles.js", "components/campaigns/worker.jsigns/worker.js", "lib/csv-validator.js"],
   "exclude": ["node_modules"]
 }

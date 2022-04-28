@@ -7,6 +7,9 @@ import * as React from 'react';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
+import PhoneNumberInfoPanel from './PhoneNumberInfoPanel';
+import SentMessagesPanel from '../messages/SentMessagesPanel';
+import ScheduledMessagesPanel from '../messages/ScheduledMessagesPanel';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -42,7 +45,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default function MessagesPanel() {
+export default function PhoneNumberDetailPanel({ phoneNumber }) {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
@@ -51,11 +54,11 @@ export default function MessagesPanel() {
     };
 
     return (
-        <Box sx={{ width: 500 }}>
+        <Box sx={{ width: '100%' }}>
             <Tabs
                 value={value}
                 onChange={handleChange}
-                
+
                 variant="fullWidth"
                 aria-label="full width tabs example"
             >
@@ -65,13 +68,13 @@ export default function MessagesPanel() {
             </Tabs>
 
             <TabPanel value={value} index={0} dir={theme.direction}>
-                Info
+                <PhoneNumberInfoPanel numberInfo={phoneNumber} />
             </TabPanel>
             <TabPanel value={value} index={1} dir={theme.direction}>
-                Sent
+                <SentMessagesPanel messages={phoneNumber.messages} />
             </TabPanel>
             <TabPanel value={value} index={2} dir={theme.direction}>
-                Scheduled
+                <ScheduledMessagesPanel messages={phoneNumber.messages}/>
             </TabPanel>
         </Box>
     );

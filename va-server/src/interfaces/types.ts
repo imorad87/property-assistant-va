@@ -1,22 +1,65 @@
-import { PhoneNumber } from "../entities/phone-number.entity";
+import { Field, GraphQLTimestamp, InputType, Int, ObjectType } from "@nestjs/graphql";
+import { Campaign } from "src/entities/campaign.entity";
 import { Contact } from "../entities/contact.entity";
-import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 
+@InputType()
 export class IContact {
+    @Field(type => Int)
     id?: number
-    name?: string;
+
+    @Field({ nullable: true })
+    first_name?: string;
+
+    @Field({ nullable: true })
+    last_name?: string;
+
+    @Field(type => [String!]!, { nullable: true })
     phone_numbers?: string[];
+
+    @Field({ nullable: true })
     active?: boolean;
+
+    @Field({ nullable: true })
     status?: string;
+
+    @Field({ nullable: true })
+    initital_message?: string;
+
+    @Field(type => Int, { nullable: true })
+    campaign_id?: number;
+
+    @Field(type => Int, { nullable: true })
+    property_id?: number;
 }
 
+@InputType()
 export class IContactView extends IContact {
-    id?: number
-    name?: string;
+    @Field(type => Int)
+    id?: number;
+
+    @Field({ nullable: true })
+    first_name?: string;
+
+    @Field({ nullable: true })
+    last_name?: string;
+
+    @Field(type => [String!]!)
+
     phone_numbers?: string[];
+
+    @Field({ nullable: true })
     active?: boolean;
+
+    @Field({ nullable: true })
     status?: string;
+
+    @Field(type => Int)
     campaign_id?: number;
+
+
+    @Field(type => Int, { nullable: true })
+    property_id: number;
+
     created_at?: Date;
     updated_at?: Date;
 }
@@ -26,8 +69,11 @@ export class IContactCreateObject extends IContact {
     @Field(type => Int, { nullable: true })
     id?: number
 
-    @Field()
-    name: string;
+    @Field({ nullable: true })
+    first_name: string;
+
+    @Field({ nullable: true })
+    last_name: string;
 
     @Field(type => [String!]!)
     phone_numbers: string[];
@@ -38,14 +84,26 @@ export class IContactCreateObject extends IContact {
     @Field({ nullable: true })
     status?: string;
 
+    @Field({ nullable: true })
+    initital_message?: string;
+
     @Field(type => Int, { nullable: true })
     campaign_id?: number;
+
+    @Field(type => Int, { nullable: true })
+    property_id: number;
 }
 
 @InputType()
 export class IContactUpdateObject extends IContact {
     @Field(type => Int)
     id: number;
+
+    @Field({ nullable: true })
+    active?: boolean;
+
+    @Field({ nullable: true })
+    status?: string;
 }
 
 export class IPhoneNumber {
@@ -85,16 +143,32 @@ export class IPhoneNumberUpdateObject extends IPhoneNumber {
     remark?: string;
 }
 
+
+@InputType()
 export class ICampaign {
+    @Field(type => Int, { nullable: true })
     id?: number;
+
+    @Field()
     title?: string;
-    leads_count?: number;
-    phone_numbers_count?: number;
-    active?: boolean;
-    parsing_status?: string;
+
+    @Field()
+    status?: string;
+
+    @Field({ nullable: true })
     file_path?: string;
-    failed_count?: number;
+
+    @Field(type => Int, { nullable: true })
     success_count?: number;
+
+    @Field(type => Int, { nullable: true })
+    failed_count?: number;
+
+    @Field(type => Int, { nullable: true })
+    total_records?: number;
+
+    @Field(type => Int, { nullable: true })
+    duplicates_count?: number;
 }
 
 export class ICampaignView extends ICampaign {
@@ -107,8 +181,12 @@ export class ICampaignView extends ICampaign {
 export class ICampaignCreateObject extends ICampaign {
     @Field()
     title: string;
-    @Field(type => [String!]!)
-    phone_numbers: string[];
+
+    @Field()
+    file_path: string;
+
+    @Field()
+    status: string;
 }
 
 @InputType()
@@ -120,15 +198,28 @@ export class ICampaignUpdateObject extends ICampaign {
 
 @InputType()
 export class ISMSMessage {
-    @Field(type => Int)
+    @Field(type => Int, { nullable: true })
     id?: number;
-    @Field()
+
+    @Field({ nullable: true })
     body?: string;
-    @Field()
+
+    @Field({ nullable: true })
     status?: string;
-    @Field(type => Int)
+
+    @Field({ nullable: true })
+    status_message?: string;
+
+    @Field({ nullable: true })
+    active?: Boolean;
+
+    @Field({ nullable: true })
+    classification?: string;
+
+    @Field(type => Int, { nullable: true })
     phone_number?: number;
-    @Field()
+
+    @Field({ nullable: true })
     type?: string;
 }
 
@@ -148,8 +239,17 @@ export class ISMSMessageCreateObject extends ISMSMessage {
     @Field()
     status: string;
 
+    @Field({ nullable: true })
+    status_message?: string;
+
+    @Field()
+    active: boolean;
+
     @Field(type => Int)
     phone_number: number;
+
+    @Field({ nullable: true })
+    classification?: string;
 }
 
 @InputType()
@@ -157,17 +257,26 @@ export class ISMSMessageUpdateObject extends ISMSMessage {
     @Field(type => Int)
     id: number;
 
-    @Field()
+    @Field({ nullable: true })
     body?: string;
 
-    @Field()
+    @Field({ nullable: true })
+    status_message?: string;
+
+    @Field({ nullable: true })
     status?: string;
 
-    @Field(type => Int)
+    @Field({ nullable: true })
+    active?: boolean;
+
+    @Field(type => Int, { nullable: true })
     phone_number?: number;
 
-    @Field()
+    @Field({ nullable: true })
     type?: string;
+    
+    @Field({ nullable: true })
+    classification?: string;
 }
 
 @ObjectType()
@@ -189,7 +298,108 @@ export class ContactsStats {
 
 }
 
+@InputType()
+export class InitialMessage {
+    @Field(type => Int, { nullable: true })
+    id?: number;
 
+    @Field()
+    message?: string;
+}
 
+@InputType()
+export class InitialMessageCreateObject extends InitialMessage {
 
+    @Field()
+    message: string;
+}
 
+@InputType()
+export class InitialMessageUpdateObject extends InitialMessage {
+    @Field(type => Int!)
+    id: number;
+
+    @Field()
+    message: string;
+}
+
+@InputType()
+export class IProperty {
+
+    @Field(type => Int, { nullable: true })
+    id?: number;
+
+    @Field({ nullable: true })
+    address?: string;
+
+    @Field({ nullable: true })
+    type?: string;
+
+    @Field({ nullable: true })
+    state?: string;
+
+    @Field({ nullable: true })
+    zip?: string;
+
+    @Field({ nullable: true })
+    county?: string;
+
+    @Field({ nullable: true })
+    apn?: string;
+
+    @Field(type => GraphQLTimestamp, { nullable: true })
+    created_at?: Date;
+
+    @Field(type => GraphQLTimestamp, { nullable: true })
+    updated_at?: Date;
+}
+
+@InputType()
+export class IPropertyCreateObject extends IProperty {
+
+    @Field()
+    address: string;
+
+    @Field()
+    type: string;
+
+    @Field()
+    state: string;
+
+    @Field()
+    zip: string;
+
+    @Field()
+    county: string;
+
+    @Field()
+    apn: string;
+}
+
+@InputType()
+export class IPropertyUpdateObject extends IProperty {
+    @Field(type => Int!)
+    id: number;
+}
+
+export type ProcessingConstraints = {
+    recordsStatus: string;
+    customMessage?: string;
+    interval?: number;
+};
+
+export type CSVJobDescription = {
+    file: Express.Multer.File,
+    campaign: Campaign,
+    constraints: ProcessingConstraints
+};
+
+export type ContactRecord = {
+    firstname: string,
+    lastname: string,
+    phoneNumbers: string[],
+    active?: boolean,
+    initialMessage?: string
+    propertyId?: number,
+    campaignId: number
+}

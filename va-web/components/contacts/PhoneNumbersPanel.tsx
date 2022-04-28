@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import * as React from 'react';
-import MessagesPanel from './messages/MessagesPanel';
+import PhoneNumberDetailPanel from './phone-numbers/PhoneNumberDetailPanel';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -20,6 +20,7 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`vertical-tabpanel-${index}`}
       aria-labelledby={`vertical-tab-${index}`}
+      style={{width:'100%'}}
       {...other}
     >
       {value === index && (
@@ -59,8 +60,8 @@ export default function PhoneNumbersPanel({ phoneNumbers }) {
       );
 
       mainPanels.push(
-        <TabPanel key={i} value={value} index={i}>
-          <MessagesPanel />
+        <TabPanel key={i} value={value} index={i} >
+          <PhoneNumberDetailPanel phoneNumber={n} />
         </TabPanel>
       );
     });

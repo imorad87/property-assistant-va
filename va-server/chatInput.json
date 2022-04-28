@@ -1,0 +1,182 @@
+{
+  "name": "Corpus",
+  "locale": "en-US",
+  "data": [
+    {
+      "intent": "wondring.identity",
+      "utterances": [
+        "Who is this",
+        "Who are you",
+        "what are you",
+        "why did you sent to me"
+      ],
+      "answers": [
+        "We are investors looking to buy properties like yours, are you open to a call so we can discuss your property further"
+      ]
+    },
+    {
+      "intent": "wondring.contact.details",
+      "utterances": [
+        "How did you get my number",
+        "Where did you get my number",
+        "how did you get my information"
+      ],
+      "answers": [
+        "My boss gave me a list of people to contact that he said he'd be interested in buying their property, is that something you'd be interested in"
+      ]
+    },
+    {
+      "intent": "wondring.offer",
+      "utterances": [
+        "How much are you offering",
+        "offer",
+        "Depends on your offer",
+        "Depends on the offer",
+        "Whats your offer",
+        "How much are you going to give me",
+        "What will you pay"
+      ],
+      "answers": [
+        "We wouldn't be able to give you an offer without knowing more about the property, are you open to a call so we can discuss futher?"
+      ]
+    },
+    {
+      "intent": "wondring.cash",
+      "utterances": [
+        "money",
+        "cash only",
+        "cash"
+      ],
+      "answers": [
+        "We pay cash but we wouldn't be able to give you an offer without knowing more about the property, are you open to a call so we can discuss futher?"
+      ]
+    },
+    {
+      "intent": "postive.specific.number",
+      "utterances": [
+        "If you cant offer any number dont waste my time",
+        "wont accept less than any number",
+        "has to be at least any number",
+        "I'm looking for any number",
+        "I am looking for any number",
+        "what is your price",
+        "looking for any price",
+        "looking for any number",
+        "dont waste my time unless you give me any number"
+      ],
+      "answers": [
+        "Your number might work but we wouldn't be able to give you an offer without knowing more about the property, are you open to a call so we can discuss futher?"
+      ]
+    },
+    {
+      "intent": "positive",
+      "utterances": [
+        "Im interested",
+        "what do you need",
+        "call me",
+        "what do you need to know",
+        "not for sale",
+        "yes",
+        "yes he can call",
+        "im ready for a call",
+        "yes we can talk",
+        "we can talk",
+        "i can talk",
+        "i can speak",
+        "i get off work at",
+        "yes we can speak",
+        "I am available",
+        "when can he call",
+        "when can we talk",
+        "when can we speak",
+        "what time",
+        "i have no equity",
+        "it is in bad shape",
+        "house is in bad shape",
+        "bad damage",
+        "i owe too much",
+        "foreclosure",
+        "auction",
+        "its going to auction",
+        "its under foreclosure",
+        "liens",
+        "fighting with the bank",
+        "okay yes",
+        "okay call me",
+        "okay",
+        "help me",
+        "help",
+        "short sale",
+        "can you help"
+      ],
+      "answers": [
+        "I will have my boss reach out as soon as he is available"
+      ]
+    },
+    {
+      "intent": "situation",
+      "utterances": [
+        "situation"
+      ],
+      "answers": [
+        "We've seen all sorts of situations & im sure we can help, I'll have my boss give you a call as soon as he is available"
+      ]
+    },
+    {
+      "intent": "negative",
+      "utterances": [
+        "wrong number ",
+        "wrong person ",
+        "thats not me ",
+        "I dont own any properties",
+        "thats not my property",
+        "thats not my address ",
+        "thats not my house ",
+        "thats not my land ",
+        "this isnt (lead name)",
+        "im not (lead name)",
+        "you have the wrong number",
+        "stop texting me",
+        "fuck off",
+        "fuck you",
+        "delete me",
+        "remove me from your list",
+        "remove me",
+        "dont contact me",
+        "stop calling ",
+        "stop",
+        "sold",
+        "it already sold",
+        "its gone",
+        "too late",
+        "already gone",
+        "dont own it anymore",
+        "go away",
+        "no"
+      ],
+      "answers": [
+        "okay, sorry to bother you have a great day"
+      ]
+    },
+    {
+      "intent": "angry",
+      "utterances": [
+        "I'm reporting you",
+        "I am reporting you",
+        "will report you"
+      ],
+      "answers": [
+        "I'm sorry for contacting you wont happen again"
+      ]
+    },
+    {
+      "intent": "None",
+      "utterances": [
+        ""
+      ],
+      "answers": [
+        "unknown"
+      ]
+    }
+  ]
+}

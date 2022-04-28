@@ -45,10 +45,17 @@ const Navigation = () => {
                                 Contacts
                             </NavLink>
                         </div>
+                        <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                            <NavLink
+                                href="/initial-messages"
+                                active={router.pathname === '/initial-messages'}>
+                                Initial Messages
+                            </NavLink>
+                        </div>
 
                     </div>
 
-                    
+
 
                     {/* Hamburger */}
                     <div className="-mr-2 flex items-center sm:hidden">
@@ -119,7 +126,7 @@ const Navigation = () => {
                                 </div>
                                 <div className="font-medium text-sm text-gray-500">
                                     Email
-                                    
+
                                 </div>
                             </div>
                         </div>

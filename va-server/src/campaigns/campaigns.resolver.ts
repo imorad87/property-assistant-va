@@ -32,7 +32,7 @@ export class CampaignsResolver {
         return await this.campaignService.update(updateInput);
     }
 
-    @Mutation((returns) => Boolean)
+    @Mutation((returns) => Boolean, {name:'removeCampaign'})
     async remove(@Args('id', { type: () => Int }) id: number) {
         return await this.campaignService.delete(id);
     }

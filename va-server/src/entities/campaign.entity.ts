@@ -16,15 +16,19 @@ export class Campaign {
 
     @Field(type => Int)
     @Column({ default: 0 })
-    leads_count: number;
+    total_records: number;
+
+    @Field(type => Int)
+    @Column({ default: 0 })
+    duplicates_count: number;
 
     @Field(type => Int)
     @Column({ default: 0 })
     phone_numbers_count: number;
 
     @Field()
-    @Column({ default: true })
-    active: boolean;
+    @Column()
+    status: string;
 
     @Field()
     @Column({ default: Constants.PARSING })

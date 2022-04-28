@@ -7,8 +7,6 @@ import { PhoneNumber } from '../entities/phone-number.entity';
 @Injectable()
 export class PhoneNumbersService {
 
-
-
     private logger = new Logger(PhoneNumbersService.name);
 
     constructor(@InjectRepository(PhoneNumber) private phoneNumbersRepo: Repository<PhoneNumber>) { }
@@ -44,11 +42,30 @@ export class PhoneNumbersService {
         return this.phoneNumbersRepo.find();
     }
 
+    async findByNumber(n: string) {
+        return this.phoneNumbersRepo
+            .createQueryBuilder('phoneNumber')
+            .leftJoinAndSelect('phoneNumber.messages', 'messages')
+            .where("phoneNumber.number like :number", { number: `%${n}%` })
+            .getOne()
+    }
+
     async getContact(id: number) {
         return (await this.phoneNumbersRepo.findOne({ where: { id }, relations: ['contact'] })).contact;
     }
 
     async getMessages(id: number) {
         return (await this.phoneNumbersRepo.findOne({ where: { id }, relations: ['messages'] })).messages;
+    }
+
+    async isDuplicate(number: string) {
+        return await this.phoneNumbersRepo.createQueryBuilder('numbers').where("numbers.number = :number", { number }).getCount() ? true : false;
+    }
+
+    async findByNumberExact(number: string) {
+        return await this.phoneNumbersRepo
+            .createQueryBuilder('numbers')
+            .where("numbers.number = :text", { text: `${number}` })
+            .getOne();
     }
 }

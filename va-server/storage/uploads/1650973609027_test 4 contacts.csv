@@ -1,0 +1,11 @@
+owner_1_first_name,owner_1_last_name,owner_1_numbers,owner_2_first_name,owner_2_last_name,owner_2_numbers,property_full_address,property_zip,property_county,property_state,property_apn,property_type,active
+Contact 1 Firstname,Contact 1 Lastname,"Contact 1 Number 1, Contact 1 number 2",Mariam,Moustafa,01111111111,Address 1234,123456,Miami County,Miami,0,House,false
+Contact 2 Firstname,Contact 2 Lastname,"Contact 2 Number 1, Contact 2 number 2",Sophia,Noah,"824149,1236223",Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 3 Firstname,Contact 3 Lastname,"Contact 3 Number 1, Contact 3 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 4 Firstname,Contact 4 Lastname,"Contact 4 Number 1, Contact 4 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 5 Firstname,Contact 5 Lastname,"Contact 5 Number 1, Contact 5 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 6 Firstname,Contact 6 Lastname,"Contact 6 Number 1, Contact 6 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 7 Firstname,Contact 7 Lastname,"Contact 7 Number 1, Contact 7 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 8 Firstname,Contact 8 Lastname,"Contact 8 Number 1, Contact 8 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 9 Firstname,Contact 9 Lastname,"Contact 9 Number 1, Contact 9 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE
+Contact 10 Firstname,Contact 10 Lastname,"Contact 10 Number 1, Contact 10 number 2",,,,Address 1234,123456,Miami County,Miami,1,House,TRUE

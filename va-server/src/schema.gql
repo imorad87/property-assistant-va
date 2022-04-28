@@ -5,8 +5,11 @@
 type SMSMessage {
   id: Int!
   body: String!
-  status: String!
+  status: String
+  active: Boolean!
   type: String!
+  status_message: String
+  classification: String
   phone_number: PhoneNumber!
   created_at: Timestamp!
   updated_at: Timestamp!
@@ -21,20 +24,37 @@ type PhoneNumber {
   id: Int!
   number: String!
   active: Boolean!
-  remark: String!
+  remark: String
   contact: Contact!
   messages: [SMSMessage!]!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+  getContact: Contact!
+  getMessages: [SMSMessage!]!
+}
+
+type Property {
+  id: Int!
+  address: String!
+  type: String!
+  state: String!
+  apn: String!
+  zip: String!
+  county: String!
+  contacts: [Contact!]!
   created_at: Timestamp!
   updated_at: Timestamp!
 }
 
 type Contact {
   id: Int!
-  name: String!
+  first_name: String!
+  last_name: String!
   active: Boolean!
   status: String!
   phone_numbers: [PhoneNumber!]!
   campaign: Campaign!
+  property: Property!
   created_at: Timestamp!
   updated_at: Timestamp!
 }
@@ -42,14 +62,22 @@ type Contact {
 type Campaign {
   id: Int!
   title: String!
-  leads_count: Int!
+  total_records: Int!
+  duplicates_count: Int!
   phone_numbers_count: Int!
-  active: Boolean!
+  status: String!
   parsing_status: String!
   file_path: String!
   failed_count: Int!
   success_count: Int!
   contacts: [Contact!]!
+  created_at: Timestamp!
+  updated_at: Timestamp!
+}
+
+type InitialMessage {
+  id: Int!
+  message: String!
   created_at: Timestamp!
   updated_at: Timestamp!
 }
@@ -66,6 +94,11 @@ type Query {
   getAllContacts: [Contact!]!
   findContact(id: Int!): Contact!
   contactsStats: ContactsStats!
+  getAllPropertys: [Property!]!
+  getProperty(id: Int!): Property!
+  getAllInitialMessage: [InitialMessage!]!
+  getInitialMessage(id: Int!): InitialMessage!
+  searchInitialMessages(body: String!): [InitialMessage!]!
   getAllCampaigns: [Campaign!]!
   getCampaign(id: Int!): Campaign!
   getAllPhoneNumbers: [PhoneNumber!]!
@@ -77,12 +110,24 @@ type Query {
 type Mutation {
   createContact(input: IContactCreateObject!): Contact!
   updateContact(input: IContactUpdateObject!): Contact!
-  removeContact(id: Int!): Contact!
+  activateAllNumbers(id: Int!): Boolean!
+  deactivateAllNumbers(id: Int!): Boolean!
+  activateAllMessages(id: Int!): Boolean!
+  deactivateAllMessages(id: Int!): Boolean!
+  removeContact(id: Int!): Boolean!
+  createProperty(input: IPropertyCreateObject!): Property!
+  updateProperty(input: IPropertyUpdateObject!): Property!
+  removeProperty(id: Int!): Boolean!
+  createMany(input: [InitialMessageCreateObject!]!): [InitialMessage!]!
+  createInitialMessage(input: InitialMessageCreateObject!): InitialMessage!
+  updateInitialMessage(input: InitialMessageUpdateObject!): InitialMessage!
+  removeInitialMessage(id: Int!): Boolean!
   createCampaign(input: ICampaignCreateObject!): Campaign!
   updateCampaign(input: ICampaignUpdateObject!): Campaign!
-  remove(id: Int!): Boolean!
-  create(createPhoneNumberInput: IPhoneNumberCreateObject!): PhoneNumber!
+  removeCampaign(id: Int!): Boolean!
+  createPhoneNumber(createPhoneNumberInput: IPhoneNumberCreateObject!): PhoneNumber!
   updatePhoneNumber(updatePhoneNumberInput: IPhoneNumberUpdateObject!): PhoneNumber!
+  removePhoneNumber(id: Int!): Boolean!
   createMessage(input: ISMSMessageCreateObject!): SMSMessage!
   updateMessage(input: ISMSMessageUpdateObject!): SMSMessage!
   removeMessage(id: Int!): SMSMessage!
@@ -90,24 +135,82 @@ type Mutation {
 
 input IContactCreateObject {
   id: Int
-  name: String!
+  first_name: String
+  last_name: String
   phone_numbers: [String!]!
   active: Boolean
   status: String
+  initital_message: String
   campaign_id: Int
+  property_id: Int
 }
 
 input IContactUpdateObject {
   id: Int!
+  first_name: String
+  last_name: String
+  phone_numbers: [String!]
+  active: Boolean
+  status: String
+  initital_message: String
+  campaign_id: Int
+  property_id: Int
+}
+
+input IPropertyCreateObject {
+  id: Int
+  address: String!
+  type: String!
+  state: String!
+  zip: String!
+  county: String!
+  apn: String!
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+
+input IPropertyUpdateObject {
+  id: Int!
+  address: String
+  type: String
+  state: String
+  zip: String
+  county: String
+  apn: String
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+
+input InitialMessageCreateObject {
+  id: Int
+  message: String!
+}
+
+input InitialMessageUpdateObject {
+  id: Int!
+  message: String!
 }
 
 input ICampaignCreateObject {
+  id: Int
   title: String!
-  phone_numbers: [String!]!
+  status: String!
+  file_path: String!
+  success_count: Int
+  failed_count: Int
+  total_records: Int
+  duplicates_count: Int
 }
 
 input ICampaignUpdateObject {
   id: Int!
+  title: String!
+  status: String!
+  file_path: String
+  success_count: Int
+  failed_count: Int
+  total_records: Int
+  duplicates_count: Int
 }
 
 input IPhoneNumberCreateObject {
@@ -123,17 +226,23 @@ input IPhoneNumberUpdateObject {
 }
 
 input ISMSMessageCreateObject {
-  id: Int!
+  id: Int
   body: String!
   status: String!
+  status_message: String
+  active: Boolean!
+  classification: String
   phone_number: Int!
   type: String!
 }
 
 input ISMSMessageUpdateObject {
   id: Int!
-  body: String!
-  status: String!
-  phone_number: Int!
-  type: String!
+  body: String
+  status: String
+  status_message: String
+  active: Boolean
+  classification: String
+  phone_number: Int
+  type: String
 }
