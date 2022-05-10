@@ -30,7 +30,7 @@ export class CampaignsService {
     }
 
     async findOne(id: number) {
-        return await this.campaignsRepo.findOne(id);
+        return await this.campaignsRepo.findOne({ where: { id } });
     }
 
     async findAll() {
@@ -71,7 +71,7 @@ export class CampaignsService {
 
     async update(campaign: ICampaignUpdateObject) {
         const savedCampaign = await this.campaignsRepo.save(campaign);
-        return this.campaignsRepo.findOne(campaign.id);
+        return this.campaignsRepo.findOne({ where: { id: campaign.id } });
     }
 
     async getContacts(id: number) {

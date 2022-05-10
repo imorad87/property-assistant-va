@@ -3,15 +3,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Checkbox, FormControl, FormControlLabel, FormLabel, Grid, GridProps, IconButton, Radio, RadioGroup, TextField } from '@mui/material';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import { useSnackbar } from 'notistack';
 import React, { SyntheticEvent, useState } from 'react';
 import CreateCustomMessage from './CreateCustomMessage';
 import CustomMessageView from './CustomMessageView';
-
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -30,13 +29,15 @@ const Item = ({ children, ...props }: GridProps) => (<Grid item {...props}>{chil
 
 export default function CreateCampaignModal({ isOpen, handleClose }) {
 
+    const { enqueueSnackbar } = useSnackbar()
+
     const [customMessage, setCustomMessage] = React.useState('');
 
     const initialFile: any = null;
 
     const [file, setFile] = useState(initialFile);
 
-    const [open, setOpen] = React.useState(false);
+    const [createMessages, setCreateMessages] = React.useState(true);
 
     const [showLoader, setShowLoader] = React.useState(false);
 
@@ -52,15 +53,11 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
 
     const [campaignStatus, setCampaignStatus] = React.useState('all-active');
 
-    const [message, setMessage] = useState('');
-
-    const [severity, setSeverity] = useState('');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
     const resetState = () => {
-
         setCustomMessage('');
         setFile(null);
-        setOpen(false);
         setShowLoader(false);
         setShowAlert(false);
         setTitle('');
@@ -68,24 +65,8 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
         setMsgInterval(100);
         setFileName(undefined);
         setCampaignStatus('all-active');
-        setMessage('');
-        setSeverity('');
-
+        setCreateMessages(true);
     }
-
-    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-        props,
-        ref,
-    ) {
-        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-    });
-
-    const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpen(false);
-    };
 
     const uploadToClient = (event) => {
         if (event.target.files && event.target.files[0]) {
@@ -110,11 +91,8 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
 
         setShowLoader(true);
 
-        if (file.type != 'text/csv') {
-            setOpen(true);
-            setMessage('Please select a CSV file')
-            setSeverity('error')
-            setShowAlert(true);
+        if (!file || file.type != 'text/csv') {
+            enqueueSnackbar('Please select a CSV file', { variant: 'error' })
             setShowLoader(false);
             return;
         }
@@ -126,24 +104,20 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
         body.append("interval", `${msgInterval}`);
         body.append("customMessageEnabled", `${customMessageEnabled}`);
         body.append("customMessage", `${customMessage}`);
+        body.append("createMessages", `${createMessages}`);
 
         axios
-            .post('http://localhost:3001/upload', body)
+            .post(`${apiUrl}upload`, body)
             .then(res => res.data)
             .then(data => {
-                setOpen(true);
-                setMessage('File Uploaded Succesfully. Processing...')
-                setSeverity('success')
+                enqueueSnackbar('File Uploaded Succesfully. Processing...', { variant: 'success' })
                 setShowLoader(false);
                 resetState();
                 handleClose();
             })
             .catch(err => {
-                console.log(err);
-
-                setOpen(true);
-                setMessage(err.message)
-                setSeverity('error')
+                enqueueSnackbar(err.message, { variant: 'error' })
+                resetState();
             });
     }
 
@@ -153,6 +127,14 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
 
     const handleTitleChange = (e) => {
         setTitle(e.currentTarget.value);
+    };
+
+
+    const handleCreateMessageChange = (e) => {
+        setCreateMessages(prev => !prev);
+        if (customMessageEnabled) {
+            setCustomMessageEnabled(false);
+        }
     };
 
     const handleIntervalChange = (e) => {
@@ -178,7 +160,6 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
             setCustomMessageEnabled(false);
         } else {
             setCustomMessageEnabled(true);
-
         }
     }
 
@@ -234,8 +215,6 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
                                             />
                                         </Item>
                                     </Container>
-                                    {/* <Input variant='standard' type="file" name="file" id="file" onChange={uploadToClient} label='Select CSV' required /> */}
-
 
                                     <FormControl>
                                         <FormLabel id="active">Campaign Status</FormLabel>
@@ -252,9 +231,9 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
                                         </RadioGroup>
                                     </FormControl>
 
+                                    <FormControlLabel control={<Checkbox checked={createMessages} onChange={handleCreateMessageChange} />} label="Create initital messages?" />
 
-
-                                    <FormControlLabel control={<Checkbox checked={customMessageEnabled} onChange={handleCustomMessageEnabled} />} label="Custom Message?" />
+                                    <FormControlLabel control={<Checkbox checked={customMessageEnabled} onChange={handleCustomMessageEnabled} disabled={!createMessages} />} label="Custom Message?" />
 
                                     {
                                         customMessageEnabled && customMessage === '' ? <CreateCustomMessage setMessage={handleCustomMessage} /> : <CustomMessageView message={customMessage} replaceMessage={handleReplaceMessage} />
@@ -290,28 +269,17 @@ export default function CreateCampaignModal({ isOpen, handleClose }) {
                                         loadingPosition="end"
                                         variant="contained"
                                         type='submit'
+                                        disabled={!title || !file}
                                     >
-                                        Send
+                                        Upload
                                     </LoadingButton>
-                                    {/* 
-                                    <Button variant="outlined" type='submit'>
-                                        Submit
-                                    </Button> */}
+                             
                                 </div>
                             </form>
                         </div>
                     </div>
-                    {showAlert && !fileName && <Alert severity="error">You must select a CSV File</Alert>}
                 </Box>
-
             </Modal>
-            {/* <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
-                <Alert onClose={handleSnackbarClose} severity={severity} sx={{ width: '100%' }}>
-                    {message}
-                </Alert>
-            </Snackbar> */}
-
-
         </div>
     );
 }

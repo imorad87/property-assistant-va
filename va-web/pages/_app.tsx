@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import { useApollo } from '../lib/apollo-client'
 import { ApolloProvider } from '@apollo/client';
+import { SnackbarProvider } from 'notistack';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -9,7 +10,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Component {...pageProps} />
+      <SnackbarProvider maxSnack={3}>
+        <Component {...pageProps} />
+      </SnackbarProvider>
     </ApolloProvider>
   );
 }

@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { throttle, debounce } from 'lodash';
-import * as React from 'react';
+import React from 'react';
 
 
 
@@ -62,7 +62,7 @@ export default function InitialMessagesAutoComplete({ setMessage }) {
     React.useEffect(() => {
         fetch();
 
-    }, [inputValue]);
+    }, [inputValue, fetch]);
 
     return (
         <Autocomplete
@@ -87,7 +87,7 @@ export default function InitialMessagesAutoComplete({ setMessage }) {
 
             onInputChange={(event, newInputValue) => {
                 setInputValue(newInputValue);
-                
+
             }}
 
             renderInput={(params) => (

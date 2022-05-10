@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import Head from "next/head";
-import * as React from 'react';
+import React from 'react';
 import Navigation from "./Navigation";
 
 const AppLayout = ({ header, children }) => {
@@ -9,7 +9,7 @@ const AppLayout = ({ header, children }) => {
             <Head>
                 <title>Property VA</title>
             </Head>
-            <Grid container sx={{ width: '60%' }} flexDirection='column' marginX='auto'>
+            <Grid container sx={{ width: '65%' }} flexDirection='column' marginX='auto'>
 
                 <Navigation />
                 <header className="bg-white shadow">

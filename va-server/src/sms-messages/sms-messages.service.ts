@@ -34,12 +34,16 @@ export class SMSMessagesService {
     }
   }
 
+  async createMany(newMessages: SMSMessage[]) {
+    return await this.messagesRepo.insert(newMessages);
+  }
+
   async findAll() {
     return await this.messagesRepo.find();
   }
 
   async findOne(id: number) {
-    return await this.messagesRepo.findOne(id);
+    return await this.messagesRepo.findOne({ where: { id } });
   }
 
   async update(updatedMessage: ISMSMessageUpdateObject) {
@@ -63,16 +67,13 @@ export class SMSMessagesService {
   }
 
   async setMessageStatus(id: number, status: string, statusMessage: string) {
-    console.log("🚀 ~ file: sms-messages.service.ts ~ line 66 ~ SMSMessagesService ~ setMessageStatus ~ status", status)
     try {
-      const message = await this.messagesRepo.findOne(id);
-      console.log("🚀 ~ file: sms-messages.service.ts ~ line 69 ~ SMSMessagesService ~ setMessageStatus ~ message", message.id)
+      const message = await this.messagesRepo.findOne({ where: { id } });
       message.status = status;
       message.status_message = statusMessage;
       await this.messagesRepo.save(message);
     } catch (error) {
       console.log(error);
-
     }
   }
 
@@ -84,4 +85,13 @@ export class SMSMessagesService {
     return await this.messagesRepo.find({ where: { status: Constants.SCHEDULED, active: true }, relations: ['phone_number'] });
   }
 
+
+  async getLatestOutgoingMessages(id: number) {
+    return await this.messagesRepo
+      .createQueryBuilder('message')
+      .innerJoinAndSelect('message.phone_number', 'phone_number', 'phoneNumberId = :id', { id })
+      .where({ type: Constants.OUTGOING })
+      .orderBy('message.created_at', 'DESC')
+      .getMany();
+  }
 }

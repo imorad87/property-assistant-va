@@ -3,8 +3,9 @@ import { Campaign } from '../entities/campaign.entity';
 import { PhoneNumber } from '../entities/phone-number.entity';
 import { Property } from '../entities/property.entity';
 import { Contact } from '../entities/contact.entity';
-import { ContactsStats, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
+import { ContactsStats, IContactCreateObject, IContactUpdateObject, PaginationResult } from '../interfaces/types';
 import { ContactsService } from './contacts.service';
+import { Pagination } from 'nestjs-typeorm-paginate';
 
 @Resolver(of => Contact)
 export class ContactsResolver {
@@ -16,9 +17,25 @@ export class ContactsResolver {
         return await this.contactsService.create(createContactInput);
     }
 
-    @Query(() => [Contact]!, { name: 'getAllContacts' })
-    async findAll() {
-        return await this.contactsService.findAll();
+    @Query(() => PaginationResult!, { name: 'getAllContacts' })
+    async findAll(
+        @Args({ name: 'page', type: () => Int }) page: number,
+        @Args({ name: 'limit', type: () => Int }) limit: number,
+        @Args({ name: 'search' }) search: string = '',
+    ) {
+        return await this.contactsService.findAll({
+            page,
+            limit
+        },
+            search
+        );
+    }
+
+    @Query(() => PaginationResult!, { name: 'searchContacts' })
+    async search(
+        @Args({ name: 'search' }) search: string,
+    ) {
+        return await this.contactsService.searchContacts(search);
     }
 
     @Query(() => Contact, { name: 'findContact' })
@@ -46,19 +63,24 @@ export class ContactsResolver {
         return await this.contactsService.deactivateAllNumbers(id);
     }
 
-    @Mutation(() => Boolean, { name: 'activateAllMessages' })
-    async activateAllMessages(@Args({ name: 'id', type: () => Int! }) id: number) {
-        return await this.contactsService.activateAllMessages(id);
+    @Mutation(() => Boolean, { name: 'activateManyContacts' })
+    async activateManyContacts(@Args({ name: 'ids', type: () => [Int!]! }) ids: number[]) {
+        return await this.contactsService.activateManyContacts(ids);
     }
 
-    @Mutation(() => Boolean, { name: 'deactivateAllMessages' })
-    async deactivateAllMessages(@Args({ name: 'id', type: () => Int! }) id: number) {
-        return await this.contactsService.deactivateAllMessages(id);
+    @Mutation(() => Boolean, { name: 'deactivateManyContacts' })
+    async deactivateManyContacts(@Args({ name: 'ids', type: () => [Int!]! }) ids: number[]) {
+        return await this.contactsService.deactivateManyContacts(ids);
     }
 
     @Mutation(() => Boolean, { name: 'removeContact' })
     async remove(@Args('id', { type: () => Int }) id: number) {
         return await this.contactsService.remove(id);
+    }
+
+    @Mutation(() => Boolean, { name: 'removeManyContacts' })
+    async removeMany(@Args('ids', { type: () => [Int!]! }) ids: number[]) {
+        return await this.contactsService.removeMany(ids);
     }
 
     @ResolveField('phone_numbers', returns => [PhoneNumber!]!)

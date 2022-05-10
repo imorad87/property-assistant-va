@@ -2,11 +2,36 @@ version: '3.4'
 
 services:
   vaserver:
-    image: vaserver
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    environment:
-      NODE_ENV: production
+    image: node:12-alpine
+    command: npm i && npm run start:dev
     ports:
       - 3001:3001
+    working_dir: /vaserver
+    volumes:
+      - ./:/vaserver
+    environment:
+      APP_NAME: PropertyAssistantVA
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 3306
+      DATABASE_NAME: property-assistant-va
+      DATABASE_USER: root
+      DATABASE_PASSWORD: 993213
+  mysql:
+    image: mysql:5.7
+    volumes:
+       - vaserver-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 993213
+      MYSQL_DATABASE: property-assistant-va
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - cache:/data
+volumes:
+  vaserver-mysql-data:
+  cache:
+    driver: local

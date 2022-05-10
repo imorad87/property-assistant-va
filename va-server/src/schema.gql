@@ -25,6 +25,7 @@ type PhoneNumber {
   number: String!
   active: Boolean!
   remark: String
+  deactivation_reason: String
   contact: Contact!
   messages: [SMSMessage!]!
   created_at: Timestamp!
@@ -90,8 +91,30 @@ type ContactsStats {
   activeCount: Int!
 }
 
+type Meta {
+  itemCount: Int!
+  totalItems: Int!
+  itemsPerPage: Int!
+  totalPages: Int!
+  currentPage: Int!
+}
+
+type Links {
+  first: String!
+  previous: String!
+  next: String!
+  last: String!
+}
+
+type PaginationResult {
+  items: [Contact!]!
+  meta: Meta!
+  links: Links!
+}
+
 type Query {
-  getAllContacts: [Contact!]!
+  getAllContacts(page: Int!, limit: Int!, search: String!): PaginationResult!
+  searchContacts(search: String!): PaginationResult!
   findContact(id: Int!): Contact!
   contactsStats: ContactsStats!
   getAllPropertys: [Property!]!
@@ -112,9 +135,10 @@ type Mutation {
   updateContact(input: IContactUpdateObject!): Contact!
   activateAllNumbers(id: Int!): Boolean!
   deactivateAllNumbers(id: Int!): Boolean!
-  activateAllMessages(id: Int!): Boolean!
-  deactivateAllMessages(id: Int!): Boolean!
+  activateManyContacts(ids: [Int!]!): Boolean!
+  deactivateManyContacts(ids: [Int!]!): Boolean!
   removeContact(id: Int!): Boolean!
+  removeManyContacts(ids: [Int!]!): Boolean!
   createProperty(input: IPropertyCreateObject!): Property!
   updateProperty(input: IPropertyUpdateObject!): Property!
   removeProperty(id: Int!): Boolean!

@@ -1,11 +1,9 @@
-import * as React from 'react';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Link from 'next/link';
-import { useMutation } from '@apollo/client';
-import { UPDATE_CONTACT_MUTATION } from '../../lib/mutations';
+import React from 'react';
 
 const ITEM_HEIGHT = 48;
 

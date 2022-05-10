@@ -10,16 +10,20 @@ const Contacts = () => {
 
     const { loading, error, data } = useQuery(CONTACTS_PAGE_QUERY, {
         pollInterval: 1000,
+        variables: {
+            page: 1,
+            limit: 25,
+            search: ''
+        }
     });
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :( {JSON.stringify(error, null, 2)}</p>;
 
-    
+
 
     return (
         <AppLayout header='Contacts'>
-            {/* {JSON.stringify(data)} */}
             <div className="py-12 w-full">
                 <div className="w-full mx-auto">
                     <div className="bg-white overflow-hidden shadow-md sm:rounded-lg">
@@ -39,7 +43,7 @@ const Contacts = () => {
                         <Typography variant='subtitle2' fontWeight={600} className='text-gray-500' padding={2}>Leads List</Typography>
                     </div>
                     <div className="flex  gap-3 justify-around p-6 bg-white border-b border-gray-200">
-                        <LeadsDataTable contacts={data.getAllContacts} />
+                        <LeadsDataTable contactsPaginated={data.getAllContacts} />
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import * as React from 'react';
+import React from 'react';
 import PhoneNumberDetailPanel from './phone-numbers/PhoneNumberDetailPanel';
 
 interface TabPanelProps {
@@ -20,7 +20,7 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`vertical-tabpanel-${index}`}
       aria-labelledby={`vertical-tab-${index}`}
-      style={{width:'100%'}}
+      style={{ width: '100%' }}
       {...other}
     >
       {value === index && (
@@ -41,7 +41,6 @@ function a11yProps(index: number) {
 
 export default function PhoneNumbersPanel({ phoneNumbers }) {
 
-
   const [value, setValue] = React.useState(0);
 
   const [tabs, setTabs] = React.useState<any>([]);
@@ -55,8 +54,16 @@ export default function PhoneNumbersPanel({ phoneNumbers }) {
     const mainPanels: Array<any> = [];
 
     phoneNumbers.forEach((n, i: number) => {
+
       mainsTabs.push(
-        <Tab icon={<PhoneIcon />} iconPosition="start" key={n.id} label={n.number} {...a11yProps(i)} />
+        <Tab
+          icon={<PhoneIcon fontSize='small' />}
+          iconPosition="start"
+          key={n.id}
+          label={n.number}
+          style={{ textDecoration: n.deactivation_reason === 'negative-response' ? 'line-through' : undefined }}
+          {...a11yProps(i)}
+        />
       );
 
       mainPanels.push(
@@ -69,7 +76,7 @@ export default function PhoneNumbersPanel({ phoneNumbers }) {
     setTabs(mainsTabs);
     setPanels(mainPanels);
 
-  }, [phoneNumbers.length, value]);
+  }, [phoneNumbers, value]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -77,18 +84,21 @@ export default function PhoneNumbersPanel({ phoneNumbers }) {
 
   return (
 
-    <Box sx={{ flexGrow: 1, display: 'flex' }}>
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Phone Numbers Tabs"
-        sx={{ borderRight: 1, borderColor: 'divider' }}
-      >
-        {tabs.map(t => t)}
-      </Tabs>
-      {panels.map(p => p)}
-    </Box>
+    <>
+      <Box sx={{ flexGrow: 1, display: 'flex' }}>
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={value}
+          onChange={handleChange}
+          aria-label="Phone Numbers Tabs"
+          sx={{ borderRight: 1, borderColor: 'divider' }}
+        >
+          {tabs.map(t => t)}
+        </Tabs>
+        {panels.map(p => p)}
+      </Box>
+      {/* {JSON.stringify(phoneNumbers)} */}
+    </>
   );
 }

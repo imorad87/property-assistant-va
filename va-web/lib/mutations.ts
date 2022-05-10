@@ -9,7 +9,6 @@ export const ACTIVATE_CONTACT = gql`
     }
   }
   activateAllNumbers(id: $id)
-  activateAllMessages(id: $id)
 }
 `;
 
@@ -22,7 +21,17 @@ export const DEACTIVATE_CONTACT = gql`
     }
   }
   deactivateAllNumbers(id: $id)
-  deactivateAllMessages(id: $id)
+}
+`;
+export const ACTIVATE_CONTACTS = gql`
+  mutation Mutation($ids: [Int!]!) {
+  activateManyContacts(ids: $ids)
+}
+`;
+
+export const DEACTIVATE_CONTACTS = gql`
+  mutation Mutation($ids: [Int!]!) {
+  deactivateManyContacts(ids: $ids)
 }
 `;
 export const UPDATE_CAMPAIGN_MUTATION = gql`
@@ -33,6 +42,13 @@ export const UPDATE_CAMPAIGN_MUTATION = gql`
 }
 `;
 
+
+export const REMOVE_MANY_CONTACTS = gql`
+mutation RemoveManyContacts($ids: [Int!]!) {
+  removeManyContacts(ids: $ids)
+}
+`;
+
 export const CREATE_INTIAL_MESSAGE_MUTATION = gql`
 mutation CreateInitialMessage($input: InitialMessageCreateObject!) {
   createInitialMessage(input: $input) {
@@ -40,6 +56,19 @@ mutation CreateInitialMessage($input: InitialMessageCreateObject!) {
     message
     created_at
     updated_at
+  }
+}
+`;
+export const REMOVE_INITIAL_MESSAGE = gql`
+mutation Mutation($id: Int!) {
+  removeInitialMessage(id: $id)
+}
+`;
+export const UPDATE_INITIAL_MESSAGE = gql`
+mutation UpdateInitialMessage($input: InitialMessageUpdateObject!) {
+  updateInitialMessage(input: $input) {
+    id
+    message
   }
 }
 `;

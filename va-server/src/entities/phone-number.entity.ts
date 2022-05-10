@@ -23,6 +23,10 @@ export class PhoneNumber {
     @Column({ nullable: true })
     remark: string;
 
+    @Field({ nullable: true })
+    @Column({ default: null })
+    deactivation_reason: string;
+
     @ManyToOne(() => Contact, (contact) => contact.phone_numbers, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'contact_id' })
     @Field(type => Contact!)

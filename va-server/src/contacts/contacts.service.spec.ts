@@ -74,7 +74,6 @@ describe('ContactsService', () => {
     const contact = async () => await service.findOne(3);
 
     expect(contact).toThrowError();
-    // console.log(contact);
   });
 
   it('should update contact', async () => {

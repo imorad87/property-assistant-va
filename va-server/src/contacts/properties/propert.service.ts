@@ -26,7 +26,7 @@ export class PropertiesService {
     }
 
     async findOne(id: number) {
-        return await this.propertiesRepo.findOne(id);
+        return await this.propertiesRepo.findOne({ where: { id } });
     }
 
     async findAll() {

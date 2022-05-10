@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import type { NextPage } from 'next'
-import * as React from 'react'
+import  React from 'react'
 import CampaignsDataTable from '../components/campaigns/CampaignDataTable'
 import CreateCampaignModal from '../components/campaigns/CreateCampaignModal'
 import AppLayout from '../components/layouts/AppLayout'
@@ -35,7 +35,7 @@ const Home: NextPage = () => {
 
       setCampaignsData(data.getAllCampaigns)
     }
-  }, [data])
+  }, [data, loading])
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;

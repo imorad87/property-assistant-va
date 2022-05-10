@@ -7,7 +7,7 @@ const ErrorBag = ({ errors }) => {
 
     return (
         <Grid container spacing={1} flexDirection='column'>
-            {errorList.map(err => <Grid item>{err}</Grid>)}
+            {errorList.map((err, i) => <Grid item key={i}>{err}</Grid>)}
         </Grid>
     )
 }

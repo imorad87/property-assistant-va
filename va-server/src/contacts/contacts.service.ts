@@ -1,29 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { PhoneNumber } from 'src/entities/phone-number.entity';
 import { SMSMessage } from 'src/entities/sms-message.entity';
 import { Constants } from 'src/enums/constants';
 import { InitialMessagesService } from 'src/initial-messages/initial-messages.service';
-import { Repository } from 'typeorm';
+import { ArrayContains, FindOperator, ILike, Like, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { PhoneNumbersHelper } from '../helpers/phone-numbers.helper';
 import { ContactsStats, IContact, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 
 @Injectable()
 export class ContactsService {
+    async searchContacts(search: string) {
+        // return await paginate
+    }
 
     private logger = new Logger(ContactsService.name);
 
     constructor(@InjectRepository(Contact) private contactsRepo: Repository<Contact>, @InjectRepository(SMSMessage) private smsRepo: Repository<SMSMessage>, private initialMessagesService: InitialMessagesService, @InjectRepository(PhoneNumber) private phonesRepo: Repository<PhoneNumber>) { }
 
     async create(contact: IContactCreateObject): Promise<Contact> {
-        console.log("🚀 ~ file: contacts.service.ts ~ line 26 ~ ContactsService ~ create ~ contact", contact)
-
+        console.log("🚀 ~ file: contacts.service.ts ~ line 24 ~ ContactsService ~ create ~ contact", contact)
         const phoneNumbers: PhoneNumber[] = [];
 
         for await (const n of contact.phone_numbers) {
             let sms = null;
-            if (contact.initital_message) {
+
+            console.log("🚀 ~ file: contacts.service.ts ~ line 30 ~ ContactsService ~ forawait ~ contact.initital_message", contact.initital_message)
+            if (contact.initital_message != null) {
                 let exisitng = await this.initialMessagesService.findOneByText(contact.initital_message)
 
                 if (!exisitng) {
@@ -41,11 +46,22 @@ export class ContactsService {
                 })
             }
 
-            const number = this.phonesRepo.create({
+            type record = {
+                active: boolean,
+                number: string,
+                messages?: SMSMessage[]
+            }
+
+            const data :record = {
                 active: contact.active,
                 number: n,
-                messages: [sms],
-            });
+            }
+
+            if (sms) {
+                data.messages = [sms];
+            }
+
+            const number = this.phonesRepo.create(data);
 
             phoneNumbers.push(number);
         }
@@ -76,21 +92,34 @@ export class ContactsService {
         return true;
     }
 
-    async findOne(id: number) {
-        return await this.contactsRepo.findOne(id);
+    async removeMany(ids: number[]) {
+        await this.contactsRepo.createQueryBuilder().delete().from(Contact).whereInIds(ids).execute();
+        return true;
     }
 
-    async findAll() {
-        return await this.contactsRepo.find();
+    async findOne(id: number) {
+        return await this.contactsRepo.findOne({ where: { id } });
+    }
+
+    async findAll(options: IPaginationOptions, search: string) {
+        if (search) {
+
+            return await paginate<Contact>(this.contactsRepo, options, {
+                where: [
+                    { first_name: ILike(`%${search}%`) },
+                    { last_name: ILike(`%${search}%`) },
+                    { phone_numbers: { number: ILike(`%${search}%`) } },
+                    { phone_numbers: { deactivation_reason: ILike(`%${search}%`) } }
+                ]
+            });
+        }
+        return await paginate<Contact>(this.contactsRepo, options);
     }
 
     async update(contact: IContactUpdateObject) {
-        console.log("🚀 ~ file: contacts.service.ts ~ line 88 ~ ContactsService ~ update ~ contact", contact)
         const { phone_numbers, ...updates } = contact;
-        console.log("🚀 ~ file: contacts.service.ts ~ line 90 ~ ContactsService ~ update ~ updates", updates)
-        
         await this.contactsRepo.save(updates);
-        return await this.contactsRepo.findOne(contact.id);
+        return await this.contactsRepo.findOne({ where: { id: contact.id } });
     }
 
     async getCampaign(id: number) {
@@ -119,55 +148,105 @@ export class ContactsService {
     }
 
     async deactivateAllNumbers(id: number) {
-        const contact = await this.contactsRepo.findOne(id, { relations: ['phone_numbers'] });
+        const contact = await this.contactsRepo.findOne({ where: { id }, relations: ['phone_numbers', 'phone_numbers.messages'] });
         const numbers = contact.phone_numbers;
         for (const number of numbers) {
-            number.active = false;
+            if (number.active) {
+                number.active = false;
+                const messages = number.messages
+                for (const message of messages) {
+                    message.active = false;
+                }
+            }
         }
         await this.contactsRepo.save(contact);
         return true;
     }
 
     async activateAllNumbers(id: number) {
-        const contact = await this.contactsRepo.findOne(id, { relations: ['phone_numbers'] });
+        const contact = await this.contactsRepo.findOne({ where: { id }, relations: ['phone_numbers', 'phone_numbers.messages'] });
         const numbers = contact.phone_numbers;
         for (const number of numbers) {
-            number.active = true;
-        }
-        await this.contactsRepo.save(contact);
-        return true;
-    }
+            if (!number.active) {
+                if (number.deactivation_reason !== Constants.NEGATIVE_RESPONSE && number.deactivation_reason !== Constants.POSITIVE_CONVERTED && number.deactivation_reason !== Constants.UNKNOWN_RESPONSE) {
+                    number.active = true;
 
-    async deactivateAllMessages(id: number) {
-        const contact = await this.contactsRepo.findOne(id, {
-            relations: ['phone_numbers', 'phone_numbers.messages']
-        });
-        const numbers = contact.phone_numbers;
-        for (const number of numbers) {
-            const messages = number.messages
-            for (const message of messages) {
-                message.active = false;
+                    const messages = number.messages
+                    for (const message of messages) {
+                        message.active = true;
+                    }
+                }
             }
         }
         await this.contactsRepo.save(contact);
         return true;
     }
 
-    async activateAllMessages(id: number) {
-        const contact = await this.contactsRepo.findOne(id, { relations: ['phone_numbers', 'phone_numbers.messages'] });
-        const numbers = contact.phone_numbers;
-        for (const number of numbers) {
-            const messages = number.messages
-            for (const message of messages) {
-                message.active = true;
+    async deactivateManyContacts(ids: number[]) {
+        for await (const id of ids) {
+            const contact = await this.contactsRepo.findOne({
+                where: { id },
+                relations: ['phone_numbers', 'phone_numbers.messages']
+            });
+
+            contact.active = false;
+
+            const numbers = contact.phone_numbers;
+
+            for (const number of numbers) {
+                if (number.active) {
+                    number.active = false;
+                    const messages = number.messages
+                    for (const message of messages) {
+                        message.active = false;
+                    }
+                }
             }
+            await this.contactsRepo.save(contact);
         }
-        await this.contactsRepo.save(contact);
+        return true;
+    }
+
+    async activateManyContacts(ids: number[]) {
+        for await (const id of ids) {
+            const contact = await this.contactsRepo.findOne({ where: { id }, relations: ['phone_numbers', 'phone_numbers.messages'] });
+            contact.active = true;
+            const numbers = contact.phone_numbers;
+            for (const number of numbers) {
+                if (!number.active) {
+                    if (number.deactivation_reason !== Constants.NEGATIVE_RESPONSE && number.deactivation_reason !== Constants.POSITIVE_CONVERTED && number.deactivation_reason !== Constants.UNKNOWN_RESPONSE) {
+                        number.active = true;
+
+                        const messages = number.messages
+                        for (const message of messages) {
+                            message.active = true;
+                        }
+                    }
+                }
+            }
+            await this.contactsRepo.save(contact);
+        }
         return true;
     }
 
     async getPhoneNumbers(id: number) {
         const contact = await this.contactsRepo.findOne({ where: { id }, relations: ['phone_numbers'] })
         return contact.phone_numbers;
+    }
+
+    async findMany(ids: number[]) {
+        return await this.contactsRepo
+            .createQueryBuilder('contact')
+            .leftJoinAndSelect('contact.phone_numbers', 'phone_numbers')
+            .leftJoinAndSelect('contact.property', 'property')
+            .whereInIds(ids)
+            .getMany();
+    }
+
+    async setAsConverted(id: number) {
+        const contact = await this.contactsRepo.findOneBy({ id });
+        contact.status = Constants.CONVERTED;
+        contact.active = false;
+        await this.contactsRepo.save(contact);
     }
 }

@@ -68,12 +68,14 @@ const ScheduledMessagesDataTable = ({ messages }) => {
                         label={params.row.active ? 'Pause' : 'Resume'}
                         // onClick={params.row.active ? pauseContact(params.id) : resumeContact(params.id)}
                         showInMenu
+                        key='action1'
                     />,
                     <GridActionsCellItem
                         icon={<DeleteForeverRounded style={{ color: 'red' }} />}
                         label="Delete"
                         // onClick={deleteContact(params.id)}
                         showInMenu
+                        key='action2'
                     />,
                 ],
             },

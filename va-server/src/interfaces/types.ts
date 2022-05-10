@@ -33,38 +33,6 @@ export class IContact {
 }
 
 @InputType()
-export class IContactView extends IContact {
-    @Field(type => Int)
-    id?: number;
-
-    @Field({ nullable: true })
-    first_name?: string;
-
-    @Field({ nullable: true })
-    last_name?: string;
-
-    @Field(type => [String!]!)
-
-    phone_numbers?: string[];
-
-    @Field({ nullable: true })
-    active?: boolean;
-
-    @Field({ nullable: true })
-    status?: string;
-
-    @Field(type => Int)
-    campaign_id?: number;
-
-
-    @Field(type => Int, { nullable: true })
-    property_id: number;
-
-    created_at?: Date;
-    updated_at?: Date;
-}
-
-@InputType()
 export class IContactCreateObject extends IContact {
     @Field(type => Int, { nullable: true })
     id?: number
@@ -113,11 +81,6 @@ export class IPhoneNumber {
     remark?: string;
 }
 
-export class IPhoneNumberView extends IPhoneNumber {
-    contact_id?: number;
-    created_at?: Date;
-    updated_at?: Date;
-}
 
 @InputType()
 export class IPhoneNumberCreateObject extends IPhoneNumber {
@@ -171,11 +134,6 @@ export class ICampaign {
     duplicates_count?: number;
 }
 
-export class ICampaignView extends ICampaign {
-    contacts?: Contact[]
-    created_at?: Date;
-    updated_at?: Date;
-}
 
 @InputType()
 export class ICampaignCreateObject extends ICampaign {
@@ -221,11 +179,6 @@ export class ISMSMessage {
 
     @Field({ nullable: true })
     type?: string;
-}
-
-export class ISMSMessageView extends ISMSMessage {
-    created_at?: Date;
-    updated_at?: Date;
 }
 
 @InputType()
@@ -274,7 +227,7 @@ export class ISMSMessageUpdateObject extends ISMSMessage {
 
     @Field({ nullable: true })
     type?: string;
-    
+
     @Field({ nullable: true })
     classification?: string;
 }
@@ -386,6 +339,7 @@ export type ProcessingConstraints = {
     recordsStatus: string;
     customMessage?: string;
     interval?: number;
+    createMessages?: boolean;
 };
 
 export type CSVJobDescription = {
@@ -402,4 +356,40 @@ export type ContactRecord = {
     initialMessage?: string
     propertyId?: number,
     campaignId: number
+}
+
+@ObjectType()
+class Meta {
+    @Field(type => Int)
+    itemCount: number;
+    @Field(type => Int)
+    totalItems: number;
+    @Field(type => Int)
+    itemsPerPage: number;
+    @Field(type => Int)
+    totalPages: number;
+    @Field(type => Int)
+    currentPage: number;
+}
+
+@ObjectType()
+class Links {
+    @Field()
+    first: string;
+    @Field()
+    previous: string;
+    @Field()
+    next: string;
+    @Field()
+    last: string;
+}
+
+@ObjectType()
+export class PaginationResult {
+    @Field(type => [Contact]!)
+    items: Contact[];
+    @Field(type => Meta!)
+    meta: Meta;
+    @Field(type => Links!)
+    links: Links;
 }

@@ -42,7 +42,7 @@ export class InitialMessagesService {
     }
 
     async findOne(id: number): Promise<InitialMessage> {
-        return await this.initialMessagesRepo.findOne(id);
+        return await this.initialMessagesRepo.findOne({ where: { id } });
     }
 
     async searchByText(body: string) {

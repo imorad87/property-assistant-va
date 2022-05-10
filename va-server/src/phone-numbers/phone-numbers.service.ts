@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Constants } from 'src/enums/constants';
 import { IPhoneNumberCreateObject, IPhoneNumberUpdateObject } from 'src/interfaces/types';
 import { Repository } from 'typeorm';
 import { PhoneNumber } from '../entities/phone-number.entity';
 
 @Injectable()
 export class PhoneNumbersService {
+
 
     private logger = new Logger(PhoneNumbersService.name);
 
@@ -35,7 +37,7 @@ export class PhoneNumbersService {
     }
 
     async findOne(id: number) {
-        return this.phoneNumbersRepo.findOne(id);
+        return this.phoneNumbersRepo.findOne({ where: { id } });
     }
 
     async findAll() {
@@ -46,6 +48,7 @@ export class PhoneNumbersService {
         return this.phoneNumbersRepo
             .createQueryBuilder('phoneNumber')
             .leftJoinAndSelect('phoneNumber.messages', 'messages')
+            .leftJoinAndSelect('phoneNumber.contact', 'contact')
             .where("phoneNumber.number like :number", { number: `%${n}%` })
             .getOne()
     }
@@ -67,5 +70,12 @@ export class PhoneNumbersService {
             .createQueryBuilder('numbers')
             .where("numbers.number = :text", { text: `${number}` })
             .getOne();
+    }
+
+    async deactivateWithReason(id: number, deactivationReason: string) {
+        const number = await this.phoneNumbersRepo.findOneBy({ id });
+        number.active = false;
+        number.deactivation_reason = deactivationReason;
+        await this.phoneNumbersRepo.save(number);
     }
 }

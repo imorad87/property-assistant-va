@@ -22,16 +22,17 @@ export class ChatbotService {
 
                 this.net = new NeuralNetwork({
                     log: true,
+                    iterations: 60000
                 });
 
                 this.net.train(JSON.parse(corpus));
+
             }
         )();
     }
 
 
     getClassification(input) {
-        // console.log(input);
 
         const inputArray = input.split(" ");
 
@@ -56,7 +57,6 @@ export class ChatbotService {
 
     async getResponse(input) {
         const res = await this.bot.process('en', input);
-        console.log("🚀 ~ file: chatbot.service.ts ~ line 27 ~ ChatbotService ~ getResponse ~ response", res.answer);
         return res;
     }
 

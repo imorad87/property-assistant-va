@@ -1,4 +1,5 @@
 import { Grid, Typography } from '@mui/material';
+import { grey } from '@mui/material/colors';
 import React from 'react';
 
 const PropertyInfoCard = ({ propertyInfo }) => {
@@ -8,32 +9,32 @@ const PropertyInfoCard = ({ propertyInfo }) => {
     return (
         <Grid container direction='column' rowSpacing={2}>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body1" color="initial">ID</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body1" color="initial">{id}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>ID</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{id}</Typography></Grid>
             </Grid>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body1" color="initial">Address</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Address</Typography></Grid>
                 <Grid item xs={8}>{address}
                 </Grid>
             </Grid>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body1" color="initial">State</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body1" color="initial">{state}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>State</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{state}</Typography></Grid>
             </Grid>
 
             <Grid container item direction='row' xs={4}>
-                <Grid item xs={4}><Typography variant="body1" color="initial">County</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body1" color="initial">{county}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>County</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{county}</Typography></Grid>
             </Grid>
 
             <Grid container item direction='row' xs={4}>
-                <Grid item xs={4}><Typography variant="body1" color="initial">Zip</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body1" color="initial">{zip}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Zip</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{zip}</Typography></Grid>
             </Grid>
 
             <Grid container item direction='row' xs={4}>
-                <Grid item xs={4}><Typography variant="body1" color="initial">Type</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body1" color="initial">{type}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Type</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{type}</Typography></Grid>
             </Grid>
 
         </Grid>

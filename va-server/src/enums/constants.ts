@@ -34,5 +34,13 @@ export enum Constants {
     CONVERTED = 'converted',
 
     //status messages
-    SCHEDULED_TO_SEND = 'to be sent'
+    SCHEDULED_TO_SEND = 'to be sent',
+
+
+    //number deactivation reasons
+    POSITIVE_CONVERTED = 'positive-converted',
+    UNKNOWN_RESPONSE = 'unknown-response',
+    NEGATIVE_RESPONSE = 'negative-response',
+
+
 }

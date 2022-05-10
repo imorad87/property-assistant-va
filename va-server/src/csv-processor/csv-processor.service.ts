@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Job, Queue } from 'bull';
 import { Contact } from 'src/entities/contact.entity';
 import { Property } from 'src/entities/property.entity';
@@ -15,6 +15,7 @@ import { CSVParser } from './csv-parser';
 
 @Injectable()
 export class CSVProcessorService {
+    private logger = new Logger(CSVProcessorService.name);
 
     private count: number = 0;
     private randomMessage: string;
@@ -49,7 +50,7 @@ export class CSVProcessorService {
             this.count++;
 
             await this.parseAndSaveRecord(record, constraints);
-            
+
             await this.campaignsService.incrementTotalRecords(this.campaign.id);
         }
 
@@ -140,20 +141,27 @@ export class CSVProcessorService {
             }
         }
 
+        console.log("🚀 ~ file: csv-processor.service.ts ~ line 146 ~ CSVProcessorService ~ parseAndSaveRecord ~ constraints.createMessages", constraints.createMessages)
 
-        if (customMessage) {
-            owner1.initialMessage = customMessage;
-            if (owner2) owner2.initialMessage = customMessage;
-        } else {
+        if (constraints.createMessages) {
+            if (customMessage) {
+                owner1.initialMessage = customMessage;
+                if (owner2) owner2.initialMessage = customMessage;
+            } else {
 
-            if (this.count === constraints.interval) {
-                this.count = 0;
-                this.randomMessage = await (await this.getRandomInitialMessage()).message;
+                if (this.count === constraints.interval) {
+                    this.count = 0;
+                    this.randomMessage = (await this.getRandomInitialMessage()).message;
+                }
+
+                owner1.initialMessage = this.randomMessage;
+
+                if (owner2) owner2.initialMessage = this.randomMessage;
             }
+        }else{
+            owner1.initialMessage = null;
 
-            owner1.initialMessage = this.randomMessage;
-
-            if (owner2) owner2.initialMessage = this.randomMessage;
+            if (owner2) owner2.initialMessage = null;
         }
 
         let savedProperty: Property;
@@ -197,7 +205,9 @@ export class CSVProcessorService {
         try {
             return await this.contactsService.create(contact);
         } catch (error) {
-            console.log("🚀 ~ file: csv-processor.service.ts ~ line 193 ~ CSVProcessorService ~ saveContact ~ error", error)
+            this.logger.error(error.message);
+            console.log(error);
+            
             await this.campaignsService.incrementFailedCount(this.campaign.id);
         }
     }

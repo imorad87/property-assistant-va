@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
+import React from 'react';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
@@ -19,6 +19,7 @@ interface TabPanelProps {
 }
 
 function TabPanel(props: TabPanelProps) {
+
     const { children, value, index, ...other } = props;
 
     return (
@@ -47,6 +48,7 @@ function a11yProps(index: number) {
 
 export default function PhoneNumberDetailPanel({ phoneNumber }) {
     const theme = useTheme();
+
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -54,28 +56,33 @@ export default function PhoneNumberDetailPanel({ phoneNumber }) {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <Tabs
-                value={value}
-                onChange={handleChange}
+        <>
+            <Box sx={{ width: '100%' }}>
 
-                variant="fullWidth"
-                aria-label="full width tabs example"
-            >
-                <Tab icon={<InfoRoundedIcon />} label='Info' iconPosition='start' {...a11yProps(0)} />
-                <Tab icon={<DoneAllOutlinedIcon />} iconPosition='start' label="Sent" {...a11yProps(1)} />
-                <Tab icon={<AccessAlarmOutlinedIcon />} label='Scheduled' iconPosition='start' {...a11yProps(2)} />
-            </Tabs>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    variant="fullWidth"
+                    aria-label="full width tabs example"
+                >
+                    <Tab icon={<InfoRoundedIcon />} label='Info' iconPosition='start' {...a11yProps(0)} />
+                    <Tab icon={<DoneAllOutlinedIcon />} iconPosition='start' label="Conversations" {...a11yProps(1)} />
+                    <Tab icon={<AccessAlarmOutlinedIcon />} label='Scheduled' iconPosition='start' {...a11yProps(2)} />
+                </Tabs>
 
-            <TabPanel value={value} index={0} dir={theme.direction}>
-                <PhoneNumberInfoPanel numberInfo={phoneNumber} />
-            </TabPanel>
-            <TabPanel value={value} index={1} dir={theme.direction}>
-                <SentMessagesPanel messages={phoneNumber.messages} />
-            </TabPanel>
-            <TabPanel value={value} index={2} dir={theme.direction}>
-                <ScheduledMessagesPanel messages={phoneNumber.messages}/>
-            </TabPanel>
-        </Box>
+                <TabPanel value={value} index={0} dir={theme.direction}>
+                    <PhoneNumberInfoPanel numberInfo={phoneNumber} />
+                </TabPanel>
+
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                    <SentMessagesPanel messages={phoneNumber.messages} />
+                </TabPanel>
+
+                <TabPanel value={value} index={2} dir={theme.direction}>
+                    <ScheduledMessagesPanel messages={phoneNumber.messages} />
+                </TabPanel>
+            </Box>
+            {/* {JSON.stringify(phoneNumber)} */}
+        </>
     );
 }

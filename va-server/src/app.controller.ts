@@ -1,17 +1,15 @@
-import { BadRequestException, Controller, Get, Logger, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Logger, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { AppService } from './app.service';
 import { CampaignsService } from './campaigns/campaigns.service';
-import { ChatbotService } from './chatbot/chatbot.service';
+import { ContactsService } from './contacts/contacts.service';
+import { SMSMessage } from './entities/sms-message.entity';
+import { Constants } from './enums/constants';
 import { ICampaignCreateObject, ProcessingConstraints } from './interfaces/types';
-var matador = require('bull-ui/app')({
-  redis: {
-    host: '127.0.0.1',
-    port: '6379',
-  }
-});
+import { PhoneNumbersService } from './phone-numbers/phone-numbers.service';
+import { SMSMessagesService } from './sms-messages/sms-messages.service';
 
 type RequestBody = {
   campaignStatus: string;
@@ -20,6 +18,7 @@ type RequestBody = {
   interval: string;
   customMessageEnabled: string;
   customMessage: string;
+  createMessages: string;
 }
 
 
@@ -28,7 +27,7 @@ export class AppController {
 
   private logger = new Logger(AppController.name);
 
-  constructor(private readonly appService: AppService, private chatbotService: ChatbotService, private campaignsService: CampaignsService) { }
+  constructor(private readonly appService: AppService, private campaignsService: CampaignsService, private contactsService: ContactsService, private smsService: SMSMessagesService, private phoneNumbersService: PhoneNumbersService) { }
 
   @Post('upload')
   @UseInterceptors(
@@ -59,17 +58,148 @@ export class AppController {
       recordsStatus: body.campaignStatus,
       customMessage: body.customMessage,
       interval: parseInt(body.interval),
+      createMessages: body.createMessages === 'true',
     }
 
     await this.appService.processFile(file, savedCampaign, processingConstraints)
 
   }
 
+  @Post('custom-sms')
+  async sendCustomSms(@Req() req: Request) {
+    this.logger.log(`Custom SMS Request Receieved: Message[${req.body.message}] Contacts[${req.body.selectedContacts.length}] MessagesActive[${req.body.messageActive}]`)
+
+    const message: string = req.body.message;
+    const contactsIds: number[] = req.body.selectedContacts;
+    const messageActive: boolean = req.body.messageActive;
+
+    const firstnamePlaceholder = message.includes('{firstname}');
+    const lastnamePlaceholder = message.includes('{lastname}');
+    const addressPlaceholder = message.includes('{address}');
+    const apnPlaceholder = message.includes('{apn}');
+
+    const contacts = await this.contactsService.findMany(contactsIds);
+
+    const smsList = [];
+
+    for (const contact of contacts) {
+      const { first_name, last_name, phone_numbers, property } = contact;
+
+      const { address, apn } = property;
+
+      let contactMessage = message;
+
+      if (firstnamePlaceholder) {
+        contactMessage = contactMessage.replace('{firstname}', first_name);
+      }
+
+      if (lastnamePlaceholder) {
+        contactMessage = contactMessage.replace('{lastname}', last_name);
+      }
+
+      if (addressPlaceholder) {
+        contactMessage = contactMessage.replace('{address}', address);
+      }
+
+      if (apnPlaceholder) {
+        contactMessage = contactMessage.replace('{apn}', apn);
+      }
+
+      for (const number of phone_numbers) {
+
+        if (!number.active) continue;
 
 
-  @Get("queues/*")
-  activate(@Req() req, @Res() res) {
-    matador(req, res)
+
+        const sms = new SMSMessage();
+
+        sms.active = messageActive;
+        sms.body = contactMessage;
+        sms.phone_number = number;
+        sms.status = Constants.SCHEDULED;
+        sms.status_message = 'To be sent';
+        sms.type = Constants.OUTGOING;
+
+        smsList.push(sms);
+      }
+
+    }
+
+    const savedMessages = await this.smsService.createMany(smsList);
+
+    return {
+      message: 'success'
+    }
+  }
+  @Post('custom-sms-single')
+  async sendSingleCustomSms(@Req() req: Request) {
+    this.logger.log(`Single Custom SMS Request Receieved: Message[${req.body.message}] Contacts[${req.body.selectedContacts.length}] MessagesActive[${req.body.messageActive}]`)
+
+    const message: string = req.body.message;
+    const contactsIds: number[] = req.body.selectedContacts;
+    const messageActive: boolean = req.body.messageActive;
+    const numberId: number = req.body.numberId;
+
+    const firstnamePlaceholder = message.includes('{firstname}');
+    const lastnamePlaceholder = message.includes('{lastname}');
+    const addressPlaceholder = message.includes('{address}');
+    const apnPlaceholder = message.includes('{apn}');
+
+    const contacts = await this.contactsService.findMany(contactsIds);
+
+    const smsList = [];
+
+    for (const contact of contacts) {
+      const { first_name, last_name, phone_numbers, property } = contact;
+
+      const { address, apn } = property;
+
+      let contactMessage = message;
+
+      if (firstnamePlaceholder) {
+        contactMessage = contactMessage.replace('{firstname}', first_name);
+      }
+
+      if (lastnamePlaceholder) {
+        contactMessage = contactMessage.replace('{lastname}', last_name);
+      }
+
+      if (addressPlaceholder) {
+        contactMessage = contactMessage.replace('{address}', address);
+      }
+
+      if (apnPlaceholder) {
+        contactMessage = contactMessage.replace('{apn}', apn);
+      }
+
+      for (const number of phone_numbers) {
+
+        if (number.id != numberId) continue;
+
+        const sms = new SMSMessage();
+
+        sms.active = messageActive;
+        sms.body = contactMessage;
+        sms.phone_number = number;
+        sms.status = Constants.SCHEDULED;
+        sms.status_message = 'To be sent';
+        sms.type = Constants.OUTGOING;
+
+        smsList.push(sms);
+      }
+
+    }
+
+    const savedMessages = await this.smsService.createMany(smsList);
+
+    return {
+      message: 'success'
+    }
   }
 
+
+  @Get('test')
+  async test() {
+    return await this.smsService.getLatestOutgoingMessages(1);
+  }
 }

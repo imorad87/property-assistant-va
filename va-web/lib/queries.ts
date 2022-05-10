@@ -1,7 +1,52 @@
 import { gql } from "@apollo/client";
 
 export const CONTACTS_PAGE_QUERY = gql`
-query ContactsStats {
+query GetAllContacts($page: Int!, $limit: Int!, $search: String!) {
+  getAllContacts(page: $page, limit: $limit, search:$search) {
+    meta {
+      itemCount
+      totalItems
+      itemsPerPage
+      totalPages
+      currentPage
+    }
+    
+    items {
+      id
+      first_name
+      last_name
+      active
+      status
+      phone_numbers {
+        id
+        number
+        active
+        deactivation_reason
+        remark
+        messages {
+          id
+          body
+          status
+          type
+          created_at
+          updated_at
+        }
+      }
+      campaign {
+        id
+        title
+        status
+      }
+      property {
+        id
+        address
+        type
+        state
+        zip
+        county
+      }
+    }
+  }
   contactsStats {
     allContactsCount
     leadsCount
@@ -9,40 +54,8 @@ query ContactsStats {
     pausedCount
     activeCount
   }
-  getAllContacts {
-    id
-    first_name
-    last_name
-    active
-    status
-    phone_numbers {
-      id
-      number
-      active
-      remark
-      messages {
-        id
-        body
-        status
-        status_message
-        classification
-        type
-        created_at
-        updated_at
-      }
-      created_at
-      updated_at
-    }
-    campaign {
-      id
-      title
-      status
-      created_at
-    }
-    created_at
-    updated_at
-  }
 }
+
 `;
 
 export const CONTACT_DETAIL_QUERY = gql`
@@ -57,6 +70,7 @@ query FindContact($findContactId: Int!) {
       id
       number
       active
+      deactivation_reason
       remark
       messages {
         id
@@ -68,6 +82,9 @@ query FindContact($findContactId: Int!) {
         type
         created_at
         updated_at
+      }
+      contact{
+        id
       }
     }
     campaign {
@@ -105,6 +122,7 @@ query GetAllCampaigns {
   }
 }
 `;
+
 export const GET_ALL_Initial_MESSAGES = gql`
 query GetAllInitialMessage {
   getAllInitialMessage {
@@ -115,6 +133,7 @@ query GetAllInitialMessage {
   }
 }
 `;
+
 export const SEARCH_INITIAL_MESSAGE = gql`
 query SearchInitialMessages($body: String!) {
   searchInitialMessages(body: $body) {
@@ -122,6 +141,15 @@ query SearchInitialMessages($body: String!) {
     message
     created_at
     updated_at
+  }
+}
+`;
+
+export const INITIAL_MESSAGES_PAGE = gql`
+query initialMessages {
+  getAllInitialMessage {
+    id
+    message
   }
 }
 `;
