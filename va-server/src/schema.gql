@@ -23,6 +23,7 @@ scalar Timestamp
 type PhoneNumber {
   id: Int!
   number: String!
+  number_base10: String!
   active: Boolean!
   remark: String
   deactivation_reason: String
@@ -247,6 +248,7 @@ input IPhoneNumberUpdateObject {
   number: String
   active: Boolean
   remark: String
+  deactivation_reason: String
 }
 
 input ISMSMessageCreateObject {

@@ -15,7 +15,7 @@ const CampaignInfoCard = ({ campaignInfo }) => {
             </Grid>
             <Grid container item direction='row' xs={4} >
                 <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>Title</Typography></Grid>
-                <Grid item xs={8}>{title}
+                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{title}</Typography>
                 </Grid>
             </Grid>
            

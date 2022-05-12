@@ -104,6 +104,9 @@ export class IPhoneNumberUpdateObject extends IPhoneNumber {
 
     @Field({ nullable: true })
     remark?: string;
+    
+    @Field({ nullable: true })
+    deactivation_reason?: string | null;
 }
 
 

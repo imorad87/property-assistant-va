@@ -24,7 +24,8 @@ export class PhoneNumbersService {
     }
 
     async update(updatedPhoneNumber: IPhoneNumberUpdateObject) {
-        return await this.phoneNumbersRepo.save(updatedPhoneNumber)
+        await this.phoneNumbersRepo.save(updatedPhoneNumber)
+        return this.phoneNumbersRepo.findOneBy({id:updatedPhoneNumber.id});
     }
 
     async delete(id: number) {
@@ -32,7 +33,7 @@ export class PhoneNumbersService {
         if (!number) {
             throw new Error(`The number with id: ${id} does not exist!`);
         }
-        await this.phoneNumbersRepo.delete(number);
+        await this.phoneNumbersRepo.remove(number);
         return true;
     }
 
@@ -67,8 +68,10 @@ export class PhoneNumbersService {
 
     async findByNumberExact(number: string) {
         return await this.phoneNumbersRepo
-            .createQueryBuilder('numbers')
-            .where("numbers.number = :text", { text: `${number}` })
+            .createQueryBuilder('phoneNumber')
+            .leftJoinAndSelect('phoneNumber.messages', 'messages')
+            .leftJoinAndSelect('phoneNumber.contact', 'contact')
+            .where("phoneNumber.number_base10 = :text", { text: `${number}` })
             .getOne();
     }
 

@@ -12,6 +12,13 @@ export const ACTIVATE_CONTACT = gql`
 }
 `;
 
+export const UPDATE_CONTACT = gql`
+mutation UpdateContact($input: IContactUpdateObject!) {
+  updateContact(input: $input) {
+    id
+  }
+}
+`;
 export const DEACTIVATE_CONTACT = gql`
   mutation Mutation($input: IContactUpdateObject!, $id: Int!) {
   updateContact(input: $input) {
@@ -59,6 +66,11 @@ mutation CreateInitialMessage($input: InitialMessageCreateObject!) {
   }
 }
 `;
+export const REMOVE_NUMBER = gql`
+mutation RemovePhoneNumber($id: Int!) {
+  removePhoneNumber(id: $id)
+}
+`;
 export const REMOVE_INITIAL_MESSAGE = gql`
 mutation Mutation($id: Int!) {
   removeInitialMessage(id: $id)
@@ -69,6 +81,21 @@ mutation UpdateInitialMessage($input: InitialMessageUpdateObject!) {
   updateInitialMessage(input: $input) {
     id
     message
+  }
+}
+`;
+export const UPDATE_PHONE_NUMBER = gql`
+mutation UpdatePhoneNumber($input: IPhoneNumberUpdateObject!) {
+  updatePhoneNumber(updatePhoneNumberInput: $input) {
+    id
+    number
+  }
+}
+`;
+export const UPDATE_SMS = gql`
+mutation Mutation($input: ISMSMessageUpdateObject!) {
+  updateMessage(input: $input) {
+  id  
   }
 }
 `;

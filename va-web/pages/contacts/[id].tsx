@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { UploadRounded, RestartAltRounded } from '@mui/icons-material'
 import ChatIcon from '@mui/icons-material/Chat'
-import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
 import PauseCircleFilledRoundedIcon from '@mui/icons-material/PauseCircleFilledRounded'
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import { Grid, IconButton, Tooltip } from '@mui/material'
@@ -11,15 +11,18 @@ import CampaignInfoCard from '../../components/campaigns/CampaignCard'
 import ContactCard from '../../components/contacts/ContactCard'
 import PhoneNumbersPanel from '../../components/contacts/PhoneNumbersPanel'
 import PropertyInfoCard from '../../components/contacts/PropertyInfoCard'
+import UploadToPodio from '../../components/contacts/UploadToPodio'
 import AppLayout from '../../components/layouts/AppLayout'
-import { ACTIVATE_CONTACT, DEACTIVATE_CONTACT } from '../../lib/mutations'
+import { ACTIVATE_CONTACT, DEACTIVATE_CONTACT, UPDATE_CONTACT } from '../../lib/mutations'
 import { CONTACT_DETAIL_QUERY } from '../../lib/queries'
 
 const Contact = () => {
 
     const router = useRouter()
 
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [dialogOpen, setDialogOpen] = React.useState(false);
 
     const { id } = router.query
 
@@ -27,6 +30,8 @@ const Contact = () => {
         variables: { findContactId: parseInt(id as string) },
         pollInterval: 1000,
     });
+
+    const [updateContact] = useMutation(UPDATE_CONTACT);
 
     const [activateContact, activateStatus] = useMutation(ACTIVATE_CONTACT);
 
@@ -52,7 +57,7 @@ const Contact = () => {
         if (data) {
             enqueueSnackbar('Contact Paused', { variant: 'success' })
         }
-        
+
         if (errors) {
             enqueueSnackbar('Cannot deactivate', { variant: 'error' })
         }
@@ -74,8 +79,36 @@ const Contact = () => {
         if (errors) {
             enqueueSnackbar('Cannot reactivate', { variant: 'error' })
         }
-       
+
     }
+    
+    const resetContact = async () => {
+        const { data, errors } = await updateContact({
+            variables: {
+                input: {
+                    id: parseInt(id as string),
+                    status: 'lead'
+                },
+            }
+        })
+
+        if (data) {
+            enqueueSnackbar('Reset Success', { variant: 'success' })
+        }
+        if (errors) {
+            enqueueSnackbar('Reset Failed', { variant: 'error' })
+        }
+
+    }
+
+
+    const handleClickOpen = () => {
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
 
     return (
         <AppLayout header={data.findContact.first_name + " " + data.findContact.last_name}>
@@ -104,12 +137,20 @@ const Contact = () => {
                                     <div className='flex'>
                                         <Tooltip title={data.findContact.active ? 'Pause' : 'Resume'}>
                                             <IconButton onClick={data.findContact.active ? pauseContact : resumeContact}>
-                                                {data.findContact.active ? <PauseCircleFilledRoundedIcon style={{ color: 'orange' }} /> : <PlayArrowRoundedIcon />}
+                                                {data.findContact.active ? <PauseCircleFilledRoundedIcon style={{ color: 'orange' }} /> : <PlayArrowRoundedIcon style={{ color: 'green' }} />}
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip title='Delete Contact'>
-                                            <IconButton>
-                                                <DeleteForeverRoundedIcon style={{ color: 'red' }} />
+                                        {
+                                            data.findContact.status === 'converted' &&
+                                            <Tooltip title='Reset Contact'>
+                                                <IconButton onClick={resetContact}>
+                                                    <RestartAltRounded style={{ color: 'orange' }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        }
+                                        <Tooltip title='Convert and Upload to Podio'>
+                                            <IconButton disabled={data.findContact.status === 'converted'} onClick={handleClickOpen}>
+                                                <UploadRounded style={{ color: data.findContact.status !== 'converted' ? 'green' : '' }} />
                                             </IconButton>
                                         </Tooltip>
                                     </div>
@@ -144,7 +185,7 @@ const Contact = () => {
                             </div>
                         </div>
                     </div>
-
+                    <UploadToPodio contact={data.findContact} open={dialogOpen} handleClose={handleDialogClose} />
                 </Grid>
             </Grid>
         </AppLayout>

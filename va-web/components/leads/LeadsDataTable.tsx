@@ -172,21 +172,22 @@ const LeadsDataTable = ({ contactsPaginated }) => {
                         icon={<VisibilityOutlinedIcon color='primary' />}
                         label="View"
                         onClick={viewContact(params.id)}
-
-                        // LinkComponent={() => <Link href={`http://localhost/contacts/${params.id}`}> View 2</Link>}
                         showInMenu
+                        key='item1'
                     />,
                     <GridActionsCellItem
                         icon={params.row.active ? <PauseCircleFilledRounded style={{ color: 'orange' }} /> : <PlayArrowRounded style={{ color: 'green' }} />}
                         label={params.row.active ? 'Pause' : 'Resume'}
                         onClick={params.row.active ? pauseContact(params.id) : resumeContact(params.id)}
                         showInMenu
+                        key='item2'
                     />,
                     <GridActionsCellItem
                         icon={<DeleteForeverRounded style={{ color: 'red' }} />}
                         label="Delete"
                         onClick={deleteContact(params.id)}
                         showInMenu
+                        key='item3'
                     />,
                 ],
             },

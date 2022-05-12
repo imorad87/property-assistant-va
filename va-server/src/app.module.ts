@@ -32,12 +32,14 @@ import { SMSMessagesModule } from './sms-messages/sms-messages.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    BullModule.forRoot({
-      
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      }
+    BullModule.forRootAsync({
+      inject:[ConfigService],
+      useFactory:(configService:ConfigService)=>({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: 6379,
+        }
+      })
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

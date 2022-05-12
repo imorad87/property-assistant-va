@@ -5,10 +5,9 @@ import { PhoneNumber } from 'src/entities/phone-number.entity';
 import { SMSMessage } from 'src/entities/sms-message.entity';
 import { Constants } from 'src/enums/constants';
 import { InitialMessagesService } from 'src/initial-messages/initial-messages.service';
-import { ArrayContains, FindOperator, ILike, Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
-import { PhoneNumbersHelper } from '../helpers/phone-numbers.helper';
-import { ContactsStats, IContact, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
+import { ContactsStats, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 
 @Injectable()
 export class ContactsService {
@@ -21,13 +20,11 @@ export class ContactsService {
     constructor(@InjectRepository(Contact) private contactsRepo: Repository<Contact>, @InjectRepository(SMSMessage) private smsRepo: Repository<SMSMessage>, private initialMessagesService: InitialMessagesService, @InjectRepository(PhoneNumber) private phonesRepo: Repository<PhoneNumber>) { }
 
     async create(contact: IContactCreateObject): Promise<Contact> {
-        console.log("🚀 ~ file: contacts.service.ts ~ line 24 ~ ContactsService ~ create ~ contact", contact)
         const phoneNumbers: PhoneNumber[] = [];
 
         for await (const n of contact.phone_numbers) {
             let sms = null;
 
-            console.log("🚀 ~ file: contacts.service.ts ~ line 30 ~ ContactsService ~ forawait ~ contact.initital_message", contact.initital_message)
             if (contact.initital_message != null) {
                 let exisitng = await this.initialMessagesService.findOneByText(contact.initital_message)
 
@@ -39,7 +36,7 @@ export class ContactsService {
 
                 sms = this.smsRepo.create({
                     active: contact.active,
-                    body: contact.initital_message,
+                    body: 'Hello ' + contact.first_name + ', ' + contact.initital_message,
                     type: Constants.OUTGOING,
                     status: Constants.SCHEDULED,
                     status_message: Constants.SCHEDULED_TO_SEND
@@ -49,12 +46,14 @@ export class ContactsService {
             type record = {
                 active: boolean,
                 number: string,
+                number_base10: string,
                 messages?: SMSMessage[]
             }
 
-            const data :record = {
+            const data: record = {
                 active: contact.active,
-                number: n,
+                number: n.trim(),
+                number_base10: `${parseInt(n.trim())}`
             }
 
             if (sms) {
@@ -98,7 +97,7 @@ export class ContactsService {
     }
 
     async findOne(id: number) {
-        return await this.contactsRepo.findOne({ where: { id } });
+        return await this.contactsRepo.findOne({ where: { id }, relations: ['property'] });
     }
 
     async findAll(options: IPaginationOptions, search: string) {

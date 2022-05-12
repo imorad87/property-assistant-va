@@ -14,6 +14,10 @@ export class PhoneNumber {
     @Field()
     @Column({ unique: true })
     number: string;
+    
+    @Field()
+    @Column({ unique: true })
+    number_base10: string;
 
     @Field()
     @Column({ default: true })

@@ -1,53 +1,30 @@
 import { useMutation } from '@apollo/client';
-import DeleteForeverRounded from '@mui/icons-material/DeleteForeverRounded';
-import PauseCircleFilledRounded from '@mui/icons-material/PauseCircleFilledRounded';
-import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { RestartAltRounded } from '@mui/icons-material';
 import { Grid, LinearProgress } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridRenderCellParams, GridRowId, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridValueSetterParams } from '@mui/x-data-grid';
-import { useRouter } from 'next/router';
+import { DataGrid, GridActionsCellItem, GridRowId } from '@mui/x-data-grid';
 import React from 'react';
+import { UPDATE_SMS } from '../../../lib/mutations';
 
 const ScheduledMessagesDataTable = ({ messages }) => {
 
-    // const deleteContact = React.useCallback(
-    //     (id: GridRowId) => () => {
 
-    //     },
-    //     [],
-    // );
+    const [retryMessage] = useMutation(UPDATE_SMS);
 
-    // const pauseContact = React.useCallback(
-    //     (id: GridRowId) => () => {
-    //         deactivateContact({
-    //             variables: {
-    //                 input: {
-    //                     id,
-    //                     active: false
-    //                 },
-    //                 id
-    //             }
-    //         })
-    //     },
-    //     [],
-    // );
-
-    // const resumeContact = React.useCallback(
-
-    //     (id: GridRowId) => () => {
-    //         activateContact({
-    //             variables: {
-    //                 input: {
-    //                     id,
-    //                     active: true
-    //                 },
-    //                 id
-    //             }
-    //         })
-    //     },
-    //     [],
-    // );
-
+    const reschedule = React.useCallback(
+        (id: GridRowId) => async () => {
+            await retryMessage({
+                variables: {
+                    input: {
+                        id,
+                        active: true,
+                        status: 'scheduled',
+                        status_message: 'To be sent'
+                    }
+                }
+            })
+        },
+        [],
+    );
 
     const columns = React.useMemo(
         () => [
@@ -64,19 +41,11 @@ const ScheduledMessagesDataTable = ({ messages }) => {
                 width: 80,
                 getActions: (params) => [
                     <GridActionsCellItem
-                        icon={params.row.active ? <PauseCircleFilledRounded style={{ color: 'orange' }} /> : <PlayArrowRounded style={{ color: 'green' }} />}
-                        label={params.row.active ? 'Pause' : 'Resume'}
-                        // onClick={params.row.active ? pauseContact(params.id) : resumeContact(params.id)}
-                        showInMenu
+                        icon={<RestartAltRounded />}
+                        label='Retry'
+                        onClick={reschedule(params.row.id)}
                         key='action1'
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteForeverRounded style={{ color: 'red' }} />}
-                        label="Delete"
-                        // onClick={deleteContact(params.id)}
-                        showInMenu
-                        key='action2'
-                    />,
+                    />
                 ],
             },
 
@@ -94,7 +63,6 @@ const ScheduledMessagesDataTable = ({ messages }) => {
                 components={{
                     LoadingOverlay: LinearProgress,
                 }}
-                // loading={activateStatus.loading || deactivateStatus.loading ? true : false}
                 pagination
             />
         </Grid>

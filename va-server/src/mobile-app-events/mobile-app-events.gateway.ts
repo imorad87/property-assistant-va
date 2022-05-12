@@ -61,7 +61,7 @@ export class MobileAppEventsGateway {
 
     await this.messageUpdateQueue.add('update-message', {
       messageId,
-      status: Constants.SENT,
+      status,
       statusMessage: error ? error : status
     })
   }
@@ -85,7 +85,7 @@ export class MobileAppEventsGateway {
 
     await this.messageUpdateQueue.add('update-message', {
       messageId,
-      status: Constants.DELIVERED,
+      status,
       statusMessage: error ? error : status
     })
   }

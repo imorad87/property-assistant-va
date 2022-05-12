@@ -1,6 +1,7 @@
 import { Process, Processor } from "@nestjs/bull";
 import { Logger } from "@nestjs/common";
 import Bull from "bull";
+import { PodioLogger } from "src/helpers/podio-logger";
 import { ChatbotService } from "../chatbot/chatbot.service";
 import { ContactsService } from "../contacts/contacts.service";
 import { Constants } from "../enums/constants";
@@ -29,8 +30,6 @@ export class MessagesUpdateHandler {
 
     @Process('update-message')
     async updateMessage(job: Bull.Job) {
-    console.log("🚀 ~ file: messages-update-handler.ts ~ line 32 ~ MessagesUpdateHandler ~ updateMessage ~ job", job.data)
-
         await this.smsService.setMessageStatus(job.data.messageId, job.data.status, job.data.statusMessage);
     }
 
@@ -44,7 +43,10 @@ export class MessagesUpdateHandler {
 
             const from: string = payload.number;
 
-            const foundNumber = await this.phoneNumbersService.findByNumber(from.replace('+', ''));
+            const rawNumber = from.replace('+', '');
+            const asNumber = parseInt(rawNumber, 10);
+            
+            const foundNumber = await this.phoneNumbersService.findByNumberExact(`${asNumber}`);
 
             if (foundNumber) {
 
@@ -84,7 +86,18 @@ export class MessagesUpdateHandler {
 
                     if (hasCallMessage) {
                         await this.contactsService.setAsConverted(foundNumber.contact.id);
+                        const contact = await this.contactsService.findOne(foundNumber.contact.id);
                         await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.POSITIVE_CONVERTED);
+                        await new PodioLogger().createLead({
+                            "id": foundNumber.contact.id,
+                            "firstname": foundNumber.contact.first_name,
+                            "lastname": foundNumber.contact.last_name,
+                            "propertyaddress": contact.property.address,
+                            "county": contact.property.county,
+                            "state": contact.property.state,
+                            "apn": contact.property.apn,
+                            "phonenumber": foundNumber.number
+                        })
                     }
                 }
 
@@ -103,6 +116,8 @@ export class MessagesUpdateHandler {
                     await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.NEGATIVE_RESPONSE);
                 }
 
+            }else{
+                this.logger.log('No matching mnumber for recieved message')
             }
 
         } catch (error) {

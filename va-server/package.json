@@ -47,6 +47,7 @@
     "mysql2": "^2.3.3",
     "nestjs-typeorm-paginate": "^4.0.1",
     "node-nlp": "^4.23.5",
+    "podio-js": "^1.6.1",
     "redis": "^4.0.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

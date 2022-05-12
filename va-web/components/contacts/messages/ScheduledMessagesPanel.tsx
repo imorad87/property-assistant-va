@@ -6,7 +6,7 @@ const ScheduledMessagesPanel = ({ messages }) => {
     const [allMessages] = React.useState(messages);
 
     const filterMessages = () => {
-        return allMessages.filter(message => (message.status === 'scheduled' || message.status === 'queued' || message.status === 'failed'));
+        return allMessages.filter(message => (message.status === 'scheduled' || message.status === 'queued' || message.status.includes('Failed')));
     }
 
     return (

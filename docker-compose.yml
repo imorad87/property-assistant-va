@@ -2,13 +2,15 @@ version: '3.4'
 
 services:
   vaserver:
+    container_name: server
+    depends_on: [mysql, cache]
     image: node:12-alpine
     command: sh -c "npm run start:dev"
     ports:
       - 3001:3001
     working_dir: /vaserver
     volumes:
-      - ./:/vaserver
+      - ./va-server:/vaserver
     environment:
       APP_NAME: PropertyAssistantVA
       DATABASE_HOST: mysql
@@ -17,8 +19,24 @@ services:
       DATABASE_USER: root
       DATABASE_PASSWORD: 993213
       REDIS_HOST: cache
-
+      PODIO_CLIENT_ID: property-assistant
+      PODIO_CLIENT_SECRET: TQgsVio517sqVFwkBqps806BcmMvSJLj9uFbIk07aP6OEgMeQ3DsWCiGGjqPtAGw
+      PODIO_APP_ID: 27503856
+      PODIO_APP_TOKEN: ba3b633f3be05240bda9c1ef058a08e7
+  vaclient:
+    container_name: client
+    depends_on: [vaserver]
+    image: node:12-alpine
+    command: sh -c "npm run dev"
+    ports:
+      - 3000:3000
+    working_dir: /vaclient
+    volumes:
+      - ./va-web:/vaclient
+    environment:
+      NEXT_PUBLIC_API_URL: vaserver
   mysql:
+    container_name: mysql
     image: mysql
     restart: always
     volumes:
@@ -27,6 +45,7 @@ services:
       MYSQL_ROOT_PASSWORD: 993213
       MYSQL_DATABASE: property-assistant-va
   cache:
+    container_name: redis
     image: redis:6.2-alpine
     restart: always
     ports:

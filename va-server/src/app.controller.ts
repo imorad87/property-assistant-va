@@ -7,6 +7,7 @@ import { CampaignsService } from './campaigns/campaigns.service';
 import { ContactsService } from './contacts/contacts.service';
 import { SMSMessage } from './entities/sms-message.entity';
 import { Constants } from './enums/constants';
+import { PodioLogger } from './helpers/podio-logger';
 import { ICampaignCreateObject, ProcessingConstraints } from './interfaces/types';
 import { PhoneNumbersService } from './phone-numbers/phone-numbers.service';
 import { SMSMessagesService } from './sms-messages/sms-messages.service';
@@ -197,9 +198,38 @@ export class AppController {
     }
   }
 
+  @Post('podio')
+  async convertAndUpload(@Req() req: Request) {
+
+  
+    const { contactId, selectedNumberId } = req.body;
+    const contact = await this.contactsService.findOne(contactId);
+    const number = await this.phoneNumbersService.findOne(selectedNumberId);
+
+    if (contact.status != Constants.CONVERTED) {
+
+      await this.contactsService.setAsConverted(contactId);
+      await this.phoneNumbersService.deactivateWithReason(selectedNumberId, Constants.POSITIVE_CONVERTED);
+      await new PodioLogger().createLead({
+        "id": `${contact.id}`,
+        "firstname": contact.first_name,
+        "lastname": contact.last_name,
+        "propertyaddress": contact.property.address,
+        "county": contact.property.county,
+        "state": contact.property.state,
+        "apn": contact.property.apn,
+        "phonenumber": number.number
+      })
+    }
+  }
+
 
   @Get('test')
   async test() {
     return await this.smsService.getLatestOutgoingMessages(1);
+  }
+  @Get('hello')
+  async hello() {
+    return 'Hello from docker'
   }
 }

@@ -1,10 +1,12 @@
-import { PauseCircleFilledRounded, PlayArrowRounded, Send } from '@mui/icons-material';
+import { useMutation } from '@apollo/client';
+import { PauseCircleFilledRounded, PlayArrowRounded, Restore, Send } from '@mui/icons-material';
 import DeleteForeverRounded from '@mui/icons-material/DeleteForeverRounded';
 import { Chip, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import React from 'react';
+import { REMOVE_NUMBER, UPDATE_PHONE_NUMBER } from '../../../lib/mutations';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -13,6 +15,9 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
     const [message, setMessage] = React.useState('');
 
     const { enqueueSnackbar } = useSnackbar();
+
+    const [updateNumber] = useMutation(UPDATE_PHONE_NUMBER);
+    const [removeNumber] = useMutation(REMOVE_NUMBER);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +42,44 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
                 variant: 'error'
             });
         }
+    }
+
+    const resetNumber = async () => {
+        await updateNumber({
+            variables: {
+                input: {
+                    id: numberInfo.id,
+                    deactivation_reason: null
+                }
+            }
+        })
+    }
+    const pauseNumber = async () => {
+        await updateNumber({
+            variables: {
+                input: {
+                    id: numberInfo.id,
+                    active: false
+                }
+            }
+        })
+    }
+    const resumeNumber = async () => {
+        await updateNumber({
+            variables: {
+                input: {
+                    id: numberInfo.id,
+                    active: true
+                }
+            }
+        })
+    }
+    const deleteNumber = async () => {
+        await removeNumber({
+            variables: {
+                id: numberInfo.id
+            }
+        })
     }
 
     return (
@@ -71,11 +114,11 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
                     </Grid>
                     <Grid item container justifySelf='flex-end' justifyContent='flex-end' xs={6}>
                         <Tooltip title='Delete Number'>
-                            <IconButton>
+                            <IconButton onClick={deleteNumber}>
                                 <DeleteForeverRounded style={{ color: 'red' }} />
                             </IconButton>
                         </Tooltip>
-                        <IconButton>
+                        <IconButton onClick={numberInfo.active ? pauseNumber : resumeNumber}>
                             {numberInfo.active ?
                                 <Tooltip title='Pause Number'>
                                     <PauseCircleFilledRounded style={{ color: 'orange' }} />
@@ -85,6 +128,13 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
                                 </Tooltip>
                             }
                         </IconButton>
+                        {numberInfo.deactivation_reason &&
+                            <IconButton onClick={resetNumber}>
+                                <Tooltip title='Reset'>
+                                    <Restore style={{ color: 'orange' }} />
+                                </Tooltip>
+                            </IconButton>
+                        }
                     </Grid>
                 </Grid>
 

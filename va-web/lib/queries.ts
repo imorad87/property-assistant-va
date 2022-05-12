@@ -21,6 +21,7 @@ query GetAllContacts($page: Int!, $limit: Int!, $search: String!) {
         id
         number
         active
+        number_base10
         deactivation_reason
         remark
         messages {
@@ -69,6 +70,7 @@ query FindContact($findContactId: Int!) {
     phone_numbers {
       id
       number
+      number_base10
       active
       deactivation_reason
       remark

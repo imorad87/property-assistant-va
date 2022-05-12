@@ -42,8 +42,6 @@ const Home: NextPage = () => {
 
   return (
     <AppLayout header='Dashboard'>
-
-
       <div className="w-full mx-auto py-12">
         <div className="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
 
