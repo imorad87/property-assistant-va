@@ -48,7 +48,7 @@ export default function UploadToPodio({ contact, handleClose, open }) {
                             value={selectedNumberId}
                             onChange={handleChange}
                         >
-                            {contact.phone_numbers.map(n => <FormControlLabel value={n.id} control={<Radio />} label={n.number} />)}
+                            {contact.phone_numbers.map(n => <FormControlLabel value={n.id} control={<Radio />} label={n.number} key={n.id}/>)}
                         </RadioGroup>
                     </FormControl>
                 </DialogContent>

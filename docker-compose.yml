@@ -26,8 +26,8 @@ services:
   vaclient:
     container_name: client
     depends_on: [vaserver]
-    image: node:12-alpine
-    command: sh -c "npm run dev"
+    image: node:14-buster-slim
+    command: sh -c "npm run start"
     ports:
       - 3000:3000
     working_dir: /vaclient

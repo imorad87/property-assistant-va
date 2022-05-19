@@ -7,6 +7,7 @@ const Dropdown = ({
     contentClasses = 'py-1 bg-white',
     trigger,
     children,
+    
 }) => {
     let alignmentClasses
 
