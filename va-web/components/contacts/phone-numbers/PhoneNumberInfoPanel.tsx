@@ -3,46 +3,14 @@ import { PauseCircleFilledRounded, PlayArrowRounded, Restore, Send } from '@mui/
 import DeleteForeverRounded from '@mui/icons-material/DeleteForeverRounded';
 import { Chip, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { grey } from '@mui/material/colors';
-import axios from 'axios';
-import { useSnackbar } from 'notistack';
 import React from 'react';
 import { REMOVE_NUMBER, UPDATE_PHONE_NUMBER } from '../../../lib/mutations';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PhoneNumberInfoPanel = ({ numberInfo }) => {
 
-    const [message, setMessage] = React.useState('');
-
-    const { enqueueSnackbar } = useSnackbar();
-
     const [updateNumber] = useMutation(UPDATE_PHONE_NUMBER);
     const [removeNumber] = useMutation(REMOVE_NUMBER);
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMessage(e.currentTarget.value);
-    }
-
-    const sendMessage = async () => {
-        try {
-            const res = await axios.post(`${apiUrl!}custom-sms-single`, {
-                message,
-                selectedContacts: [numberInfo.contact.id],
-                messageActive: true,
-                manualMessage: true,
-                numberId: numberInfo.id
-            });
-            enqueueSnackbar('Custom Message Sent', {
-                variant: 'success'
-            });
-            setMessage('');
-        } catch (err) {
-            enqueueSnackbar('Failed to send custom message', {
-                variant: 'error'
-            });
-        }
-    }
 
     const resetNumber = async () => {
         await updateNumber({
@@ -54,6 +22,7 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
             }
         })
     }
+
     const pauseNumber = async () => {
         await updateNumber({
             variables: {
@@ -64,6 +33,7 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
             }
         })
     }
+
     const resumeNumber = async () => {
         await updateNumber({
             variables: {
@@ -138,20 +108,7 @@ const PhoneNumberInfoPanel = ({ numberInfo }) => {
                     </Grid>
                 </Grid>
 
-                <Grid container item direction='row' xs={12} justifyContent='space-between' alignItems='center' flexWrap='nowrap' spacing={1}>
-                    <TextField
-                        autoFocus
-                        label='Custom Message'
-                        placeholder='enter your message here'
-                        value={message}
-                        fullWidth
-                        variant='outlined'
-                        onChange={handleChange}
-                    />
-                    <IconButton onClick={sendMessage}>
-                        <Send color='primary' />
-                    </IconButton>
-                </Grid>
+
             </Grid >
         </Grid >
     );

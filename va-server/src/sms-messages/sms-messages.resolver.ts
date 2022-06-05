@@ -28,7 +28,7 @@ export class SMSMessagesResolver {
     return await this.smsMessagesService.update(updateSmsMessageInput);
   }
 
-  @Mutation(() => SMSMessage, { name: 'removeMessage' })
+  @Mutation(() => Boolean, { name: 'removeMessage' })
   async remove(@Args('id', { type: () => Int }) id: number) {
     return await this.smsMessagesService.remove(id);
   }

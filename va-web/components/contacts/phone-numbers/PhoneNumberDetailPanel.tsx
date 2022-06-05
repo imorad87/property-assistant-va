@@ -75,11 +75,11 @@ export default function PhoneNumberDetailPanel({ phoneNumber }) {
                 </TabPanel>
 
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <SentMessagesPanel messages={phoneNumber.messages} />
+                    <SentMessagesPanel messages={phoneNumber.messages} numberInfo={phoneNumber} />
                 </TabPanel>
 
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    <ScheduledMessagesPanel messages={phoneNumber.messages} />
+                    <ScheduledMessagesPanel phoneNumber={phoneNumber} />
                 </TabPanel>
             </Box>
             {/* {JSON.stringify(phoneNumber)} */}

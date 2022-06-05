@@ -155,7 +155,7 @@ type Mutation {
   removePhoneNumber(id: Int!): Boolean!
   createMessage(input: ISMSMessageCreateObject!): SMSMessage!
   updateMessage(input: ISMSMessageUpdateObject!): SMSMessage!
-  removeMessage(id: Int!): SMSMessage!
+  removeMessage(id: Int!): Boolean!
 }
 
 input IContactCreateObject {

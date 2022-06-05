@@ -99,6 +99,11 @@ mutation Mutation($input: ISMSMessageUpdateObject!) {
   }
 }
 `;
+export const DELETE_SMS = gql`
+mutation($id: Int!){
+  removeMessage(id:$id)
+}
+`;
 
 
 

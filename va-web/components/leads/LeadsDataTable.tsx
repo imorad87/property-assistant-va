@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteForeverRounded from '@mui/icons-material/DeleteForeverRounded';
 import PauseCircleFilledRounded from '@mui/icons-material/PauseCircleFilledRounded';
@@ -16,23 +16,30 @@ import { ACTIVATE_CONTACT, ACTIVATE_CONTACTS, DEACTIVATE_CONTACT, DEACTIVATE_CON
 import { CONTACTS_PAGE_QUERY } from '../../lib/queries';
 import BulkSMSDialog from '../contacts/messages/BulkSMSDialog';
 
-const LeadsDataTable = ({ contactsPaginated }) => {
+const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConvertedCount }) => {
 
+    const { loading, error, data } = useQuery(CONTACTS_PAGE_QUERY, {
+        pollInterval: 1000,
+        variables: {
+            page: 1,
+            limit: 25,
+            search: ''
+        }
+    });
 
+    const [getContacts] = useLazyQuery(CONTACTS_PAGE_QUERY);
 
     const [removeContacts] = useMutation(REMOVE_MANY_CONTACTS);
 
+    const [contacts, setContacts] = React.useState<Array<any>>([]);
+
     const [pageSize, setPageSize] = React.useState(25);
 
-    const [loading, setLoading] = React.useState(false);
+    const [isloading, setIsLoading] = React.useState(false);
 
-    const [pageNumber, setPageNumber] = React.useState<number>(contactsPaginated.meta.currentPage || 1);
+    const [pageNumber, setPageNumber] = React.useState<number>(1);
 
-    const [totalItems, setTotalItems] = React.useState<number>(contactsPaginated.meta.totalItems);
-
-    const [contacts, setContacts] = React.useState<Array<any>>(contactsPaginated.items);
-
-    const [getContacts] = useLazyQuery(CONTACTS_PAGE_QUERY);
+    const [totalItems, setTotalItems] = React.useState<number>(0);
 
     const [selectionModel, setSelectionModel] = React.useState<GridSelectionModel>([]);
 
@@ -44,15 +51,17 @@ const LeadsDataTable = ({ contactsPaginated }) => {
         async () => {
             const res = await getContacts({
                 variables: {
-                    page: pageNumber || 1,
+                    page: pageNumber,
                     limit: pageSize,
                     search: filterValue
                 }
             });
             if (res.data.getAllContacts) {
                 setContacts(res.data.getAllContacts.items)
+                setPageNumber(res.data.getAllContacts.meta.currentPage);
+                setPageSize(res.data.getAllContacts.meta.itemsPerPage);
                 setTotalItems(res.data.getAllContacts.meta.totalItems);
-                setLoading(false);
+                setIsLoading(false);
                 setSelectionModel(prevSelectionModel.current);
             }
         }
@@ -61,11 +70,28 @@ const LeadsDataTable = ({ contactsPaginated }) => {
 
 
     React.useEffect(() => {
-        setLoading(true);
+        // setTotalItems((prevSize) => totalItems !== undefined ? totalItems : prevSize);
+
+        if (!loading && data) {
+            setContacts(data.getAllContacts.items);
+            setPageSize(data.getAllContacts.meta.itemsPerPage);
+            setPageNumber(data.getAllContacts.meta.currentPage);
+            setTotalItems(data.getAllContacts.meta.totalItems);
+            console.log(data);
+            setTotalCount(data.contactsStats.allContactsCount)
+            setActiveCount(data.contactsStats.activeCount)
+            setPausedCount(data.contactsStats.pausedCount)
+            setConvertedCount(data.contactsStats.convertedCount)
+        }
+    }, []);
+    React.useEffect(() => {
+        // setTotalItems((prevSize) => totalItems !== undefined ? totalItems : prevSize);
+
+        setIsLoading(true);
 
         requestData()
 
-    }, [pageSize, pageNumber, contactsPaginated.items, filterValue]);
+    }, [pageSize, pageNumber, filterValue]);
 
     const [activateContacts, activateStatus] = useMutation(ACTIVATE_CONTACT);
 
@@ -82,20 +108,20 @@ const LeadsDataTable = ({ contactsPaginated }) => {
 
     const deleteContact = React.useCallback(
         (id: GridRowId) => async () => {
-            setLoading(true)
+            setIsLoading(true)
             await removeContacts({
                 variables: {
                     ids: [id]
                 }
             })
-            setLoading(false)
+            setIsLoading(false)
         },
         [],
     );
 
     const pauseContact = React.useCallback(
         (id: GridRowId) => async () => {
-            setLoading(true)
+            setIsLoading(true)
 
             await deactivateContacts({
                 variables: {
@@ -107,14 +133,14 @@ const LeadsDataTable = ({ contactsPaginated }) => {
                 }
             })
 
-            setLoading(false)
+            setIsLoading(false)
         },
         [],
     );
 
     const resumeContact = React.useCallback(
         (id: GridRowId) => async () => {
-            setLoading(true)
+            setIsLoading(true)
 
             await activateContacts({
                 variables: {
@@ -126,13 +152,15 @@ const LeadsDataTable = ({ contactsPaginated }) => {
                 }
             })
 
-            setLoading(false)
+            setIsLoading(false)
         },
         [],
     );
 
 
     const filterChangehandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectionModel([]);
+        prevSelectionModel.current = []
         setFilterValue(e.target.value)
     }
 
@@ -201,15 +229,20 @@ const LeadsDataTable = ({ contactsPaginated }) => {
 
     return (
         <div style={{ height: 700, width: '100%' }}>
+            {[contacts.length, pageNumber, pageSize]}
+            {/* {JSON.stringify(contactsPaginated)} */}
             <div style={{ height: 700, width: '100%' }}>
                 <DataGrid
                     isRowSelectable={(params: GridRowParams) => params.row.status === 'lead'}
-                    loading={loading}
+                    loading={loading || isloading}
                     rows={contacts}
                     columns={columns}
-                    page={pageNumber}
+                    // page={pageNumber}
+                    // autoPageSize
                     pageSize={pageSize}
                     onPageChange={(page) => {
+                        console.log('page number ', page);
+
                         prevSelectionModel.current = selectionModel;
                         setPageNumber(page);
                     }}
@@ -225,7 +258,7 @@ const LeadsDataTable = ({ contactsPaginated }) => {
                     componentsProps={{
                         toolbar: {
                             selectionModel,
-                            setLoading,
+                            setIsLoading,
                             filterValue,
                             changeHandler: filterChangehandler,
                             clearHandler: () => setFilterValue('')
@@ -236,6 +269,9 @@ const LeadsDataTable = ({ contactsPaginated }) => {
                         setSelectionModel(newSelectionModel);
                     }}
                     filterMode="server"
+                    initialState={{
+                        pagination: { page: 2 }
+                    }}
                 // onFilterModelChange={onFilterChange}
                 />
             </div>
@@ -243,13 +279,13 @@ const LeadsDataTable = ({ contactsPaginated }) => {
     );
 }
 
-const CustomToolbar = ({ selectionModel, filterValue, changeHandler, clearHandler, setLoading }) => {
+const CustomToolbar = ({ selectionModel, filterValue, changeHandler, clearHandler, setIsLoading }) => {
     return (
         <GridToolbarContainer>
             {/* <GridToolbarExport /> */}
             <Grid container justifyContent='space-between' alignItems='center'>
                 <Grid item>
-                    <BasicMenu selectedContacts={selectionModel} setLoading={setLoading} />
+                    <BasicMenu selectedContacts={selectionModel} setIsLoading={setIsLoading} />
                 </Grid>
                 <Grid item>
                     <QuickSearchToolbar value={filterValue} clearSearch={clearHandler} onChange={changeHandler} />
@@ -259,7 +295,7 @@ const CustomToolbar = ({ selectionModel, filterValue, changeHandler, clearHandle
     );
 }
 
-function BasicMenu({ selectedContacts, setLoading }) {
+function BasicMenu({ selectedContacts, setIsLoading }) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const [removeContacts] = useMutation(REMOVE_MANY_CONTACTS);
@@ -277,36 +313,36 @@ function BasicMenu({ selectedContacts, setLoading }) {
     };
 
     const handleDelete = async () => {
-        setLoading(true)
+        setIsLoading(true)
         await removeContacts({
             variables: {
                 ids: selectedContacts
             }
         });
-        setLoading(false)
+        setIsLoading(false)
         setAnchorEl(null);
 
     };
     const handlePause = async () => {
-        setLoading(true)
+        setIsLoading(true)
         await deactivateContacts({
             variables: {
                 ids: selectedContacts
             }
         });
-        setLoading(false)
+        setIsLoading(false)
         setAnchorEl(null);
 
     };
 
     const handleResume = async () => {
-        setLoading(true)
+        setIsLoading(true)
         await activateContacts({
             variables: {
                 ids: selectedContacts
             }
         });
-        setLoading(false)
+        setIsLoading(false)
         setAnchorEl(null);
     };
 

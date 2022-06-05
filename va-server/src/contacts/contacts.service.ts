@@ -107,6 +107,7 @@ export class ContactsService {
                 where: [
                     { first_name: ILike(`%${search}%`) },
                     { last_name: ILike(`%${search}%`) },
+                    { status: ILike(`%${search}%`) },
                     { phone_numbers: { number: ILike(`%${search}%`) } },
                     { phone_numbers: { deactivation_reason: ILike(`%${search}%`) } }
                 ]

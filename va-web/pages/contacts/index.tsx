@@ -8,17 +8,15 @@ import { CONTACTS_PAGE_QUERY } from '../../lib/queries'
 
 const Contacts = () => {
 
-    const { loading, error, data } = useQuery(CONTACTS_PAGE_QUERY, {
-        pollInterval: 1000,
-        variables: {
-            page: 1,
-            limit: 25,
-            search: ''
-        }
-    });
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :( {JSON.stringify(error, null, 2)}</p>;
+
+    const [totalCount, setTotalCount] = React.useState(0)
+    const [activeCount, setActiveCount] = React.useState(0)
+    const [pausedCount, setPausedCount] = React.useState(0)
+    const [convertedCount, setConvertedCount] = React.useState(0)
+
+    // if (loading) return <p>Loading...</p>;
+    // if (error) return <p>Error :( {JSON.stringify(error, null, 2)}</p>;
 
 
 
@@ -28,11 +26,10 @@ const Contacts = () => {
                 <div className="w-full mx-auto">
                     <div className="bg-white overflow-hidden shadow-md sm:rounded-lg">
                         <div className="flex  gap-3 justify-around p-6 my-10 bg-white border-gray-200">
-                            <StatusCard title='All Contacts' value={data.contactsStats.allContactsCount} />
-                            {/* <StatusCard title='Leads' value={data.contactsStats.leadsCount} /> */}
-                            <StatusCard title='Active' value={data.contactsStats.activeCount} />
-                            <StatusCard title='Paused' value={data.contactsStats.pausedCount} />
-                            <StatusCard title='Converted' value={data.contactsStats.convertedCount} />
+                            <StatusCard title='All Contacts' value={totalCount} />
+                            <StatusCard title='Active' value={activeCount} />
+                            <StatusCard title='Paused' value={pausedCount} />
+                            <StatusCard title='Converted' value={convertedCount} />
                         </div>
                     </div>
                 </div>
@@ -43,7 +40,7 @@ const Contacts = () => {
                         <Typography variant='subtitle2' fontWeight={600} className='text-gray-500' padding={2}>Leads List</Typography>
                     </div>
                     <div className="flex  gap-3 justify-around p-6 bg-white border-b border-gray-200">
-                        <LeadsDataTable contactsPaginated={data.getAllContacts} />
+                        <LeadsDataTable setTotalCount={setTotalCount} setActiveCount={setActiveCount} setPausedCount={setPausedCount} setConvertedCount={setConvertedCount} />
                     </div>
                 </div>
             </div>

@@ -63,7 +63,12 @@ export class SMSMessagesService {
   }
 
   async remove(id: number) {
-    return await this.messagesRepo.delete(id);
+    const sms = await this.findOne(id);
+    if (!sms) {
+      throw new Error(`SMS with id ${id} doesn't exist`);
+    }
+    await this.messagesRepo.delete(id);
+    return true;
   }
 
   async setMessageStatus(id: number, status: string, statusMessage: string) {

@@ -1,17 +1,21 @@
 import { useMutation } from '@apollo/client';
-import { RestartAltRounded } from '@mui/icons-material';
+import { DeleteForever, RestartAltRounded } from '@mui/icons-material';
 import { Grid, LinearProgress } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridRowId } from '@mui/x-data-grid';
 import React from 'react';
-import { UPDATE_SMS } from '../../../lib/mutations';
+import { DELETE_SMS, UPDATE_SMS } from '../../../lib/mutations';
 
 const ScheduledMessagesDataTable = ({ messages }) => {
 
 
+
     const [retryMessage] = useMutation(UPDATE_SMS);
+    const [deleteMessage] = useMutation(DELETE_SMS);
+    const [loading, setLoading] = React.useState(false);
 
     const reschedule = React.useCallback(
         (id: GridRowId) => async () => {
+            setLoading(true)
             await retryMessage({
                 variables: {
                     input: {
@@ -22,6 +26,20 @@ const ScheduledMessagesDataTable = ({ messages }) => {
                     }
                 }
             })
+            setLoading(false)
+        },
+        [],
+    );
+
+    const deleteSms = React.useCallback(
+        (id: GridRowId) => async () => {
+            setLoading(true)
+            await deleteMessage({
+                variables: {
+                    id
+                }
+            })
+            setLoading(false)
         },
         [],
     );
@@ -45,6 +63,14 @@ const ScheduledMessagesDataTable = ({ messages }) => {
                         label='Retry'
                         onClick={reschedule(params.row.id)}
                         key='action1'
+                        showInMenu
+                    />,
+                    <GridActionsCellItem
+                        icon={<DeleteForever color='error' />}
+                        label='Delete'
+                        onClick={deleteSms(params.row.id)}
+                        key='action2'
+                        showInMenu
                     />
                 ],
             },
@@ -56,17 +82,21 @@ const ScheduledMessagesDataTable = ({ messages }) => {
 
 
     return (
-        <Grid container sx={{ minWidth: '100%' }}>
-            <DataGrid
-                rows={messages}
-                columns={columns}
-                components={{
-                    LoadingOverlay: LinearProgress,
-                }}
-                pagination
-            />
-        </Grid>
 
+        <>
+            < Grid container sx={{ minWidth: '100%' }
+            }>
+                <DataGrid
+                    rows={messages}
+                    columns={columns}
+                    components={{
+                        LoadingOverlay: LinearProgress,
+                    }}
+                    pagination
+                    loading={loading}
+                />
+            </Grid >
+        </>
     );
 }
 

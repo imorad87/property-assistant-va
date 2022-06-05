@@ -9,7 +9,7 @@ const AppLayout = ({ header, children }) => {
             <Head>
                 <title>Property VA</title>
             </Head>
-            <Grid container sx={{ width: '65%' }} flexDirection='column' marginX='auto'>
+            <Grid container sx={{ width: '95%' }} flexDirection='column' marginX='auto'>
 
                 <Navigation />
                 <header className="bg-white shadow">
