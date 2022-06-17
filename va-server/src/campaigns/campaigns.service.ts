@@ -34,7 +34,7 @@ export class CampaignsService {
     }
 
     async findAll() {
-        return await this.campaignsRepo.find();
+        return await this.campaignsRepo.createQueryBuilder('campaigns').addOrderBy('created_at', 'DESC').getMany();
     }
 
     async updateParsingStatus(status: string, id: number) {

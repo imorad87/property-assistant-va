@@ -3,7 +3,7 @@ import { Campaign } from '../entities/campaign.entity';
 import { PhoneNumber } from '../entities/phone-number.entity';
 import { Property } from '../entities/property.entity';
 import { Contact } from '../entities/contact.entity';
-import { ContactsStats, IContactCreateObject, IContactUpdateObject, PaginationResult } from '../interfaces/types';
+import { ContactsStats, FilterStatus, IContactCreateObject, IContactUpdateObject, PaginationResult } from '../interfaces/types';
 import { ContactsService } from './contacts.service';
 import { Pagination } from 'nestjs-typeorm-paginate';
 
@@ -21,27 +21,33 @@ export class ContactsResolver {
     async findAll(
         @Args({ name: 'page', type: () => Int }) page: number,
         @Args({ name: 'limit', type: () => Int }) limit: number,
-        @Args({ name: 'search' }) search: string = '',
+        @Args({ name: 'filters', type: () => FilterStatus }) filters: FilterStatus = null,
     ) {
-        return await this.contactsService.findAll({
-            page,
-            limit
-        },
-            search
-        );
+        try {
+            return await this.contactsService.findAll({
+                page,
+                limit
+            },
+                filters
+            );
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-    @Query(() => PaginationResult!, { name: 'searchContacts' })
-    async search(
-        @Args({ name: 'search' }) search: string,
-    ) {
-        return await this.contactsService.searchContacts(search);
-    }
+    // @Query(() => PaginationResult!, { name: 'searchContacts' })
+    // async search(
+    //     @Args({ name: 'search' }) search: string,
+    // ) {
+    //     return await this.contactsService.searchContacts(search);
+    // }
 
     @Query(() => Contact, { name: 'findContact' })
     async findOne(@Args('id', { type: () => Int! }) id: number) {
         return await this.contactsService.findOne(id);
     }
+
+
 
     @Query(() => ContactsStats, { name: 'contactsStats' })
     async getContactsStats() {
@@ -97,4 +103,5 @@ export class ContactsResolver {
     async getProperty(@Parent() contact: Contact) {
         return await this.contactsService.getProperty(contact.id);
     }
+
 }

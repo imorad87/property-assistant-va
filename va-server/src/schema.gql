@@ -113,12 +113,52 @@ type PaginationResult {
   links: Links!
 }
 
+type PropertyType {
+  id: Int!
+  address: String!
+  zip: String!
+  county: String!
+  state: String!
+}
+
+type MessageType {
+  id: Int!
+  type: String!
+  active: Boolean!
+  body: String!
+  status: String!
+  classification: String!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PhoneNumberType {
+  id: Int!
+  number: String!
+  messages: [MessageType!]!
+}
+
+type ContactType {
+  """
+  The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+  """
+  Int: Float!
+  firstname: String!
+  lastname: String!
+  active: Boolean!
+  phoneNumbers: [PhoneNumberType!]!
+}
+
 type Query {
-  getAllContacts(page: Int!, limit: Int!, search: String!): PaginationResult!
-  searchContacts(search: String!): PaginationResult!
+  getAllContacts(page: Int!, limit: Int!, filters: FilterStatus!): PaginationResult!
   findContact(id: Int!): Contact!
   contactsStats: ContactsStats!
   getAllPropertys: [Property!]!
+  notResponded: [Property!]!
   getProperty(id: Int!): Property!
   getAllInitialMessage: [InitialMessage!]!
   getInitialMessage(id: Int!): InitialMessage!
@@ -128,7 +168,20 @@ type Query {
   getAllPhoneNumbers: [PhoneNumber!]!
   getPhoneNumber(id: Int!): PhoneNumber!
   getAllMessages: [SMSMessage!]!
+  getNotRespondedMessages: [SMSMessage!]!
   findMessage(id: Int!): SMSMessage!
+}
+
+input FilterStatus {
+  name: String!
+  converted: Boolean!
+  leads: Boolean!
+  active: Boolean!
+  inactive: Boolean!
+  unknownResponse: Boolean!
+  negativeResponse: Boolean!
+  noConversation: Boolean!
+  phoneNumber: String!
 }
 
 type Mutation {

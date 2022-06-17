@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { SMSMessagesService } from './sms-messages.service';
 import { SMSMessage } from '../entities/sms-message.entity';
-import { ISMSMessageCreateObject, ISMSMessageUpdateObject } from 'src/interfaces/types';
+import { ISMSMessageCreateObject, ISMSMessageUpdateObject, UnrespondedDataObject } from 'src/interfaces/types';
 import { PhoneNumber } from 'src/entities/phone-number.entity';
 
 @Resolver(() => SMSMessage)
@@ -16,6 +16,11 @@ export class SMSMessagesResolver {
   @Query(() => [SMSMessage]!, { name: 'getAllMessages' })
   async findAll() {
     return await this.smsMessagesService.findAll();
+  }
+
+  @Query(() => [SMSMessage]!, { name: 'getNotRespondedMessages' })
+  async getUnrespondedData() {
+    return await this.smsMessagesService.getUnrespondedMessages();
   }
 
   @Query(() => SMSMessage, { name: 'findMessage' })

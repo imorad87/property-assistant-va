@@ -5,7 +5,7 @@ import React from 'react';
 
 const SingleMessageCard = ({ message }) => {
     return (
-        <Grid container flexDirection='column' border={1} borderRadius={3} borderColor='gray' sx={{ width: '50%' }} padding={1} boxShadow={3}>
+        <Grid container sx={{ width: '50%', height: 'fit-content', flexDirection: 'column', border: 1, borderRadius: 3, borderColor: 'gray', padding: 1, boxShadow: 3, margin: 0 }} >
             <Grid item container justifyContent='space-between' alignItems='center' >
                 <Typography variant='caption' style={{ color: grey[700] }}>{moment(message.created_at).format('MMM, DD YY')}</Typography>
                 {message.type === 'incoming' ? <Chip label="Incoming" style={{ fontSize: '0.70em', color: blue[700] }} size="small" />

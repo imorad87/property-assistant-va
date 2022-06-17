@@ -7,13 +7,14 @@ import { Constants } from 'src/enums/constants';
 import { InitialMessagesService } from 'src/initial-messages/initial-messages.service';
 import { ILike, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
-import { ContactsStats, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
+import { ContactsStats, FilterStatus, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 
 @Injectable()
 export class ContactsService {
-    async searchContacts(search: string) {
-        // return await paginate
-    }
+
+    // async searchContacts(search: string) {
+    //     // return await paginate
+    // }
 
     private logger = new Logger(ContactsService.name);
 
@@ -99,20 +100,61 @@ export class ContactsService {
     async findOne(id: number) {
         return await this.contactsRepo.findOne({ where: { id }, relations: ['property'] });
     }
+    async getAllContacts() {
+        return await this.contactsRepo
+            .createQueryBuilder('contact')
+            .leftJoinAndSelect('contact.phone_numbers', 'phone_numbers')
+            .leftJoinAndSelect('contact.property', 'property')
+            .getMany();
+    }
 
-    async findAll(options: IPaginationOptions, search: string) {
-        if (search) {
+    async findAll(options: IPaginationOptions, filters: FilterStatus) {
+        if (filters) {
+            console.log(filters);
+
+            const whereClauses = [];
+
+            if (filters.name) {
+                whereClauses.push({ first_name: ILike(`%${filters.name ? filters.name : ''}%`) })
+                // whereClauses.push({ last_name: ILike(`%${filters.name ? filters.name : ''}%`) })
+            }
+
+            // if (filters.converted) {
+            //     whereClauses.push({ status: Constants.CONVERTED })
+            // }
+
+            // if (filters.leads) {
+            //     whereClauses.push({ status: Constants.LEAD })
+            // }
+
+            // if (filters.active) {
+            //     whereClauses.push({ active: true })
+            // }
+
+            // if (filters.inactive) {
+            //     whereClauses.push({ active: false })
+            // }
+
+            // if (filters.phoneNumber) {
+            //     whereClauses.push({ phone_numbers: { number: ILike(`%${filters.phoneNumber}%`) } })
+            // }
+
+            // if (filters.negativeResponse) {
+            //     whereClauses.push({ phone_numbers: { deactivation_reason: Constants.NEGATIVE_RESPONSE } })
+            // }
+
+            // if (filters.unknownResponse) {
+            //     whereClauses.push({ phone_numbers: { deactivation_reason: Constants.UNKNOWN_RESPONSE } })
+            // }
 
             return await paginate<Contact>(this.contactsRepo, options, {
                 where: [
-                    { first_name: ILike(`%${search}%`) },
-                    { last_name: ILike(`%${search}%`) },
-                    { status: ILike(`%${search}%`) },
-                    { phone_numbers: { number: ILike(`%${search}%`) } },
-                    { phone_numbers: { deactivation_reason: ILike(`%${search}%`) } }
-                ]
+                    { first_name: ILike(`%${filters.name ? filters.name : ''}%`) }
+                ],
+                order: { created_at: 'DESC' }
             });
         }
+
         return await paginate<Contact>(this.contactsRepo, options);
     }
 

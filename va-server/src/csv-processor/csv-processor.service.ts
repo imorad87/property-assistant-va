@@ -117,12 +117,12 @@ export class CSVProcessorService {
             hasTwoOwners = true;
         }
 
-        for (const n of owner1.phoneNumbers) {
+        for await (const n of owner1.phoneNumbers) {
 
             const duplicate = await this.phoneNumbersService.isDuplicate(n);
 
             if (duplicate) {
-                owner1.phoneNumbers = owner1.phoneNumbers.filter((m) => m != n);
+                owner1.phoneNumbers = owner1.phoneNumbers.filter(m => m != n);
 
                 await this.campaignsService.incrementDuplicatesCount(this.campaign.id);
             }
@@ -130,7 +130,7 @@ export class CSVProcessorService {
 
         if (owner2) {
 
-            for (const n of owner2.phoneNumbers) {
+            for await (const n of owner2.phoneNumbers) {
 
                 const duplicate = await this.phoneNumbersService.isDuplicate(n);
 
@@ -140,8 +140,6 @@ export class CSVProcessorService {
                 }
             }
         }
-
-        console.log("🚀 ~ file: csv-processor.service.ts ~ line 146 ~ CSVProcessorService ~ parseAndSaveRecord ~ constraints.createMessages", constraints.createMessages)
 
         if (constraints.createMessages) {
             if (customMessage) {
@@ -158,7 +156,7 @@ export class CSVProcessorService {
 
                 if (owner2) owner2.initialMessage = this.randomMessage;
             }
-        }else{
+        } else {
             owner1.initialMessage = null;
 
             if (owner2) owner2.initialMessage = null;
@@ -207,7 +205,6 @@ export class CSVProcessorService {
         } catch (error) {
             this.logger.error(error.message);
             console.log(error);
-            
             await this.campaignsService.incrementFailedCount(this.campaign.id);
         }
     }

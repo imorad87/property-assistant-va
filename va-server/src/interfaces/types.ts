@@ -1,5 +1,6 @@
 import { Field, GraphQLTimestamp, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Campaign } from "src/entities/campaign.entity";
+import { Property } from "src/entities/property.entity";
 import { Contact } from "../entities/contact.entity";
 
 @InputType()
@@ -104,7 +105,7 @@ export class IPhoneNumberUpdateObject extends IPhoneNumber {
 
     @Field({ nullable: true })
     remark?: string;
-    
+
     @Field({ nullable: true })
     deactivation_reason?: string | null;
 }
@@ -395,4 +396,90 @@ export class PaginationResult {
     meta: Meta;
     @Field(type => Links!)
     links: Links;
+}
+
+@ObjectType()
+class PropertyType {
+    @Field(type => Int!)
+    id: number
+    @Field()
+    address: string
+    @Field()
+    zip?: string
+    @Field()
+    county?: string
+    @Field()
+    state?: string
+}
+@ObjectType()
+class MessageType {
+    @Field(type => Int!)
+    id: number
+    @Field()
+    type: string
+    @Field()
+    active: boolean
+    @Field()
+    body: string
+    @Field()
+    status: string
+    @Field()
+    classification: string
+    @Field()
+    createdAt: Date
+}
+
+@ObjectType()
+class PhoneNumberType {
+    @Field(type => Int!)
+    id: number
+    @Field()
+    number: string
+    @Field(type => [MessageType]!)
+    messages: MessageType[]
+}
+
+@ObjectType()
+class ContactType {
+    @Field(Int)
+    id: number
+    @Field()
+    firstname: string
+    @Field()
+    lastname: string
+    @Field()
+    active: boolean
+    @Field(type => [PhoneNumberType]!)
+    phoneNumbers?: PhoneNumberType[]
+}
+
+@ObjectType()
+export class UnrespondedDataObject {
+    @Field(type => PropertyType)
+    property: PropertyType
+
+    @Field(type => ([ContactType]!))
+    contacts: ContactType[]
+}
+
+@InputType()
+export class FilterStatus {
+    @Field()
+    name?: string;
+    @Field()
+    converted?: boolean;
+    @Field()
+    leads?: boolean;
+    @Field()
+    active?: boolean;
+    @Field()
+    inactive: boolean;
+    @Field()
+    unknownResponse?: boolean;
+    @Field()
+    negativeResponse?: boolean;
+    @Field()
+    noConversation?: boolean;
+    @Field()
+    phoneNumber?: string;
 }

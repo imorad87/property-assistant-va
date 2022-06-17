@@ -9,6 +9,7 @@ import { throttle, debounce } from 'lodash';
 import React from 'react';
 
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
 
 export default function InitialMessagesAutoComplete({ setMessage }) {
@@ -42,9 +43,8 @@ export default function InitialMessagesAutoComplete({ setMessage }) {
 
     const fetch = React.useCallback(debounce(async () => {
 
-
         const res = await axios({
-            url: 'http://localhost:3001/graphql',
+            url: `${apiUrl}graphql`,
             method: 'post',
             data: graphqlQuery
         });
@@ -56,7 +56,6 @@ export default function InitialMessagesAutoComplete({ setMessage }) {
         }
     }, 500)
         , [inputValue]);
-
 
 
     React.useEffect(() => {

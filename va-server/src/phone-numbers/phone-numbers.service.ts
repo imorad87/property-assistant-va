@@ -25,7 +25,7 @@ export class PhoneNumbersService {
 
     async update(updatedPhoneNumber: IPhoneNumberUpdateObject) {
         await this.phoneNumbersRepo.save(updatedPhoneNumber)
-        return this.phoneNumbersRepo.findOneBy({id:updatedPhoneNumber.id});
+        return this.phoneNumbersRepo.findOneBy({ id: updatedPhoneNumber.id });
     }
 
     async delete(id: number) {
@@ -62,7 +62,7 @@ export class PhoneNumbersService {
         return (await this.phoneNumbersRepo.findOne({ where: { id }, relations: ['messages'] })).messages;
     }
 
-    async isDuplicate(number: string) {
+    async isDuplicate(number: string): Promise<boolean> {
         return await this.phoneNumbersRepo.createQueryBuilder('numbers').where("numbers.number = :number", { number }).getCount() ? true : false;
     }
 

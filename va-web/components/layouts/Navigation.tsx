@@ -1,3 +1,4 @@
+import { Chip } from '@mui/material'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -49,6 +50,17 @@ const Navigation = () => {
                                 active={router.pathname === '/initial-messages'}>
                                 Initial Messages
                             </NavLink>
+                        </div>
+                        <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                            <div className="flex">
+
+                                <NavLink
+                                    href="/responses"
+                                    active={router.pathname === '/responses'}>
+                                    <span className='mr-1'> Responses</span>
+                                </NavLink>
+                                <Chip color="info" size='small' label={150} className='place-self-center'/>
+                            </div>
                         </div>
 
                     </div>

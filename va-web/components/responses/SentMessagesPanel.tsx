@@ -1,9 +1,9 @@
 import { Send } from '@mui/icons-material';
-import { Grid, TextField, IconButton } from '@mui/material';
+import { Container, Grid, IconButton, TextField } from '@mui/material'
 import axios from 'axios';
+import React from 'react'
+import SingleMessageCard from './SingleMessageCard'
 import { useSnackbar } from 'notistack';
-import React from 'react';
-import SingleMessageCard from './SingleMessageCard';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,14 +33,11 @@ const SentMessagesPanel = ({ messages, numberInfo }) => {
             enqueueSnackbar('Failed to send custom message', {
                 variant: 'error'
             });
-            console.log(err);
-
         }
     }
     return (
-        <Grid container flexDirection='column' spacing={1} justifyContent='center' alignItems='center' height='100%'>
-            {/* {JSON.stringify(numberInfo)} */}
-            <Grid container item overflow='auto' >
+        <Grid container flexDirection='column' spacing={1}>
+            <Grid container item overflow='auto' height={'600px'}>
                 {
                     messages.map(message => {
                         if (message.status !== 'scheduled' && message.status !== 'queued' && message.status !== 'Send Failed') {
@@ -55,7 +52,7 @@ const SentMessagesPanel = ({ messages, numberInfo }) => {
 
 
             </Grid>
-            <Grid container item flexDirection='row' justifyContent='space-between' alignItems='center' flexWrap='nowrap' spacing={1} marginTop={5} sx={{ justifySelf: 'flex-start' }}>
+            <Grid container item direction='row' xs={12} justifyContent='space-between' alignItems='center' flexWrap='nowrap' spacing={1} marginTop={5}>
                 <TextField
                     autoFocus
                     label='Custom Message'

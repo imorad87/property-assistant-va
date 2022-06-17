@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 export default function BulkSMSDialog({ selectedContacts, handleClose, open }) {
 
     const [hasPlaceholders, setHasPlaceholders] = React.useState(false);
@@ -64,7 +65,7 @@ export default function BulkSMSDialog({ selectedContacts, handleClose, open }) {
 
     const sendMessage = () => {
 
-        axios.post('http://localhost:3001/custom-sms', {
+        axios.post(`${apiUrl}custom-sms`, {
             message,
             messageActive,
             selectedContacts

@@ -16,9 +16,10 @@ import { ACTIVATE_CONTACT, ACTIVATE_CONTACTS, DEACTIVATE_CONTACT, DEACTIVATE_CON
 import { CONTACTS_PAGE_QUERY } from '../../lib/queries';
 import BulkSMSDialog from '../contacts/messages/BulkSMSDialog';
 
-const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConvertedCount, filters }) => {
+const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConvertedCount }) => {
 
-    const [getContacts] = useLazyQuery(CONTACTS_PAGE_QUERY);
+
+    const [getContacts, { startPolling, stopPolling }] = useLazyQuery(CONTACTS_PAGE_QUERY);
 
     const [removeContacts] = useMutation(REMOVE_MANY_CONTACTS);
 
@@ -28,7 +29,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const [pageNumber, setPageNumber] = React.useState<number>(1);
+    const [pageNumber, setPageNumber] = React.useState<number>(0);
 
     const [totalItems, setTotalItems] = React.useState<number>(0);
 
@@ -36,78 +37,46 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
     const prevSelectionModel = React.useRef<GridSelectionModel>(selectionModel);
 
-    // const [filterValue, setFilterValue] = React.useState<string | undefined>('');
+    const [filterValue, setFilterValue] = React.useState<string | undefined>('');
 
 
-
-    // const updateData = debounce(
-    //     async () => {
-
-    //         const res = await getContacts({
-    //             variables: {
-    //                 page: pageNumber + 1,
-    //                 limit: pageSize,
-    //                 filters
-    //             }
-    //         });
-
-    //         if (res.data.getAllContacts) {
-    //             setContacts(res.data.getAllContacts.items)
-    //             setTotalItems(res.data.getAllContacts.meta.totalItems);
-    //             setIsLoading(false);
-    //         }
-    //     }
-    //     , 500);
-    const updateData = React.useCallback(
+    const requestData = React.useCallback(
         async () => {
-
+            setIsLoading(true)
             const res = await getContacts({
                 variables: {
                     page: pageNumber + 1,
                     limit: pageSize,
-                    filters
+                    search: filterValue
                 }
             });
 
-            if (res.data.getAllContacts) {
-                setContacts(res.data.getAllContacts.items)
-                setTotalItems(res.data.getAllContacts.meta.totalItems);
-                setIsLoading(false);
-            }
-        }, [filters, getContacts, pageNumber, pageSize]);
+            setIsLoading(false)
+            return res.data;
+        },
+        [filterValue, getContacts, pageNumber, pageSize],
+    );
 
-
-    const { loading, error, data } = useQuery(CONTACTS_PAGE_QUERY, {
-        pollInterval: 1000,
-        variables: {
-            page: pageNumber + 1,
-            limit: pageSize,
-            filters
-        }
-    });
-
-    React.useEffect(() => {
-
-        if (!loading && data) {
-
-            setContacts(data.getAllContacts.items);
-            setTotalItems(data.getAllContacts.meta.totalItems);
-            setTotalCount(data.contactsStats.allContactsCount)
-            setActiveCount(data.contactsStats.activeCount)
-            setPausedCount(data.contactsStats.pausedCount)
-            setConvertedCount(data.contactsStats.convertedCount)
-        }
-    }, []);
 
     React.useEffect(() => {
         (
             async () => {
                 setIsLoading(true);
-                await updateData()
-                console.log('Subsequent refresh calls');
+                const data = await requestData()
+                setContacts(data.getAllContacts.items);
+                setTotalItems(data.getAllContacts.meta.totalItems)
+                setActiveCount(data.contactsStats.activeCount);
+                setConvertedCount(data.contactsStats.convertedCount);
+                setTotalCount(data.contactsStats.allContactsCount);
+                setPausedCount(data.contactsStats.pausedCount);
+                setIsLoading(false);
+                setSelectionModel(prevSelectionModel.current);
+                startPolling(500);
             }
         )();
-    }, [pageSize, pageNumber, filters]);
+
+    }, [requestData, setActiveCount, setConvertedCount, setPausedCount, setTotalCount]);
+
 
     const [activateContacts, activateStatus] = useMutation(ACTIVATE_CONTACT);
 
@@ -119,7 +88,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
         (id: GridRowId) => () => {
             router.push(`/contacts/${id}`)
         },
-        [],
+        [router],
     );
 
     const deleteContact = React.useCallback(
@@ -132,7 +101,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
             })
             setIsLoading(false)
         },
-        [],
+        [removeContacts],
     );
 
     const pauseContact = React.useCallback(
@@ -151,7 +120,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
             setIsLoading(false)
         },
-        [],
+        [deactivateContacts],
     );
 
     const resumeContact = React.useCallback(
@@ -170,19 +139,20 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
             setIsLoading(false)
         },
-        [],
+        [activateContacts],
     );
 
 
-    // const filterChangehandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setSelectionModel([]);
-    //     prevSelectionModel.current = []
-    //     setFilterValue(e.target.value)
-    // }
+    const filterChangehandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectionModel([]);
+        prevSelectionModel.current = []
+        setFilterValue(e.target.value)
+    }
 
 
 
     const columns = React.useMemo(
+
         () => [
             { field: 'id', headerName: 'ID', width: 150 },
             { field: 'first_name', headerName: 'First Name', width: 150 },
@@ -237,54 +207,59 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
             },
 
         ],
-        [viewContact, deleteContact, pauseContact, resumeContact]
+        [deleteContact, pauseContact, resumeContact, viewContact]
     );
 
-    if (activateStatus.error) return <div>Submission error! {activateStatus.error.message}</div>;
-    if (deactivateStatus.error) return <div>Submission error! {deactivateStatus.error.message}</div>;
 
     return (
+        <div style={{ height: 700, width: '100%' }}>
+            {JSON.stringify({ pagenumber: pageNumber, pageSize: pageSize, totalItems: totalItems })}
+            {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+            <div style={{ height: 700, width: '100%' }}>
+                <DataGrid
+                    isRowSelectable={(params: GridRowParams) => params.row.status === 'lead'}
+                    loading={isLoading}
+                    rows={contacts}
+                    columns={columns}
+                    // page={pageNumber === 0 ? pageNumber : pageNumber - 1}
+                    pageSize={pageSize}
+                    rowCount={totalItems}
+                    paginationMode='server'
+                    pagination
+                    checkboxSelection={true}
 
-        <div style={{ width: '100%' }}>
-            <DataGrid
-                isRowSelectable={(params: GridRowParams) => params.row.status === 'lead'}
-                loading={loading || isLoading}
-                rows={contacts}
-                columns={columns}
-                pageSize={pageSize}
-                onPageChange={(page) => {
-                    prevSelectionModel.current = selectionModel;
-                    setPageNumber(page);
-                }}
-                onPageSizeChange={(pageSize) => setPageSize(pageSize)}
-                rowCount={totalItems}
-                paginationMode='server'
-                pagination
-                checkboxSelection={true}
-                components={{
-                    Toolbar: CustomToolbar,
-                    LoadingOverlay: LinearProgress,
-                }}
-                componentsProps={{
-                    toolbar: {
-                        selectionModel,
-                        setIsLoading,
-                        // filterValue,
-                        // changeHandler: filterChangehandler,
-                        // clearHandler: () => setFilterValue('')
-                    }
-                }}
-                selectionModel={selectionModel}
-                onSelectionModelChange={(newSelectionModel) => {
-                    setSelectionModel(newSelectionModel);
-                }}
-                filterMode="server"
-            />
+                    onPageChange={(page) => {
+                        console.log(page);
+
+                        prevSelectionModel.current = selectionModel;
+                        setPageNumber(page);
+                    }}
+                    onPageSizeChange={(pageSize) => setPageSize(pageSize)}
+                    components={{
+                        Toolbar: CustomToolbar,
+                        LoadingOverlay: LinearProgress,
+                    }}
+                    componentsProps={{
+                        toolbar: {
+                            selectionModel,
+                            setIsLoading,
+                            filterValue,
+                            changeHandler: filterChangehandler,
+                            clearHandler: () => setFilterValue('')
+                        }
+                    }}
+                    selectionModel={selectionModel}
+                    onSelectionModelChange={(newSelectionModel) => {
+                        setSelectionModel(newSelectionModel);
+                    }}
+                    filterMode="server"
+                />
+            </div>
         </div>
     );
 }
 
-const CustomToolbar = ({ selectionModel, changeHandler, clearHandler, setIsLoading }) => {
+const CustomToolbar = ({ selectionModel, filterValue, changeHandler, clearHandler, setIsLoading }) => {
     return (
         <GridToolbarContainer>
             {/* <GridToolbarExport /> */}
@@ -292,9 +267,9 @@ const CustomToolbar = ({ selectionModel, changeHandler, clearHandler, setIsLoadi
                 <Grid item>
                     <BasicMenu selectedContacts={selectionModel} setIsLoading={setIsLoading} />
                 </Grid>
-                {/* <Grid item>
+                <Grid item>
                     <QuickSearchToolbar value={filterValue} clearSearch={clearHandler} onChange={changeHandler} />
-                </Grid> */}
+                </Grid>
             </Grid>
         </GridToolbarContainer>
     );
@@ -365,7 +340,7 @@ function BasicMenu({ selectedContacts, setIsLoading }) {
         <div>
             <Button
                 id="custom-actions"
-                variant='outlined'
+                variant='contained'
                 aria-controls={open ? 'bulk-actions-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}

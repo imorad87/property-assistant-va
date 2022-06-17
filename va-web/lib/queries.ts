@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const CONTACTS_PAGE_QUERY = gql`
-query GetAllContacts($page: Int!, $limit: Int!, $search: String!) {
-  getAllContacts(page: $page, limit: $limit, search:$search) {
+query GetAllContacts($page: Int!, $limit: Int!, $filters: FilterStatus!) {
+  getAllContacts(page: $page, limit: $limit, filters:$filters) {
     meta {
       itemCount
       totalItems
@@ -155,3 +155,84 @@ query initialMessages {
   }
 }
 `;
+export const NOT_RESPONDED_QUERY = gql`
+query notResponded {
+  getNotRespondedMessages {
+    id
+    created_at
+    phone_number {
+      id
+      contact {
+        id
+        property {
+          id
+          address
+          type
+          state
+          apn
+          zip
+          county
+          contacts {
+            id
+            first_name
+            last_name
+            phone_numbers {
+              id
+              number
+              messages {
+                id
+                body
+                status
+                active
+                type
+                classification
+                status_message
+                created_at
+              }
+              contact {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+// export const NOT_RESPONDED_QUERY = gql`
+// query notRespondedData {
+//   notResponded  {
+//     id
+//     address
+//     apn
+//     county
+//     state
+//     type
+//     zip
+//     contacts {
+//       id
+//       first_name
+//       last_name
+//       active
+//       status
+//       phone_numbers {
+//         id
+//         active
+//         deactivation_reason
+//         number
+//         messages {
+//           id
+//           active
+//           body
+//           classification
+//           created_at
+//           status
+//           type
+//         }
+//       }
+//     }
+//   }
+// }
+
+// `;

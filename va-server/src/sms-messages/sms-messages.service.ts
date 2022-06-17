@@ -1,19 +1,47 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isEmpty } from 'lodash';
+import { ContactsService } from 'src/contacts/contacts.service';
+import { PropertiesService } from 'src/contacts/properties/propert.service';
+import { Repository } from 'typeorm';
 import { SMSMessage } from '../entities/sms-message.entity';
 import { Constants } from '../enums/constants';
 import { ISMSMessageCreateObject, ISMSMessageUpdateObject } from '../interfaces/types';
 import { PhoneNumbersService } from '../phone-numbers/phone-numbers.service';
-import { Repository } from 'typeorm';
-import { OnEvent } from '@nestjs/event-emitter';
-
 @Injectable()
 export class SMSMessagesService {
+  async getUnrespondedMessages() {
+
+    const messages = [];
+
+    const properties = await this.propertiesService.findAll();
+
+    for (const property of properties) {
+
+      const contacts = property.contacts;
+
+      for (const contact of contacts) {
+        const numbers = contact.phone_numbers;
+        for (const number of numbers) {
+          const message = await this.messagesRepo
+            .createQueryBuilder('message')
+            .where('message.phoneNumberId = :id', { id: number.id })
+            .orderBy('created_at', 'DESC')
+            .getOne();
+          if (!isEmpty(message) && message.type === Constants.INCOMING) {
+            messages.push(message);
+          }
+        }
+      }
+
+    }
+    return messages;
+  }
 
 
   private logger = new Logger(SMSMessagesService.name);
 
-  constructor(@InjectRepository(SMSMessage) private messagesRepo: Repository<SMSMessage>, private phoneNumbersService: PhoneNumbersService) { }
+  constructor(@InjectRepository(SMSMessage) private messagesRepo: Repository<SMSMessage>, private phoneNumbersService: PhoneNumbersService, private contactsService: ContactsService, private propertiesService: PropertiesService) { }
 
   async create(newMessage: ISMSMessageCreateObject) {
     try {

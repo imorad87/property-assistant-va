@@ -5,11 +5,13 @@ import isEqual from 'lodash/isEqual'
 
 let apolloClient;
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
+
 function createApolloClient() {
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
-      uri: 'http://localhost:3001/graphql', // Server URL (must be absolute)
+      uri: `${apiUrl}graphql`, // Server URL (must be absolute)
       // credentials: 'same-origin', // Additional fetch() options like `credentials` or `headers`
     }),
     cache: new InMemoryCache({

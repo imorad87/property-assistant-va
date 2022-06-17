@@ -22,13 +22,18 @@ export class PropertyResolver {
         return await this.propertiesService.findAll();
     }
 
+    @Query((returns) => [Property]!, { name: 'notResponded' })
+    async getPropertiesWithContactsWithUnrespondedMessages() {
+        return await this.propertiesService.getPropertiesWithContactsWithUnrespondedMessages();
+    }
+
     @Query((returns) => Property, { name: 'getProperty' })
     async findOne(@Args('id', { type: () => Int }) id: number) {
         return await this.propertiesService.findOne(id);
     }
 
     @Mutation((returns) => Property!, { name: 'updateProperty' })
-    async update(@Args('input') updateInput: IPropertyUpdateObject) : Promise<Property>{
+    async update(@Args('input') updateInput: IPropertyUpdateObject): Promise<Property> {
         return await this.propertiesService.update(updateInput);
     }
 

@@ -5,6 +5,7 @@ import { diskStorage } from 'multer';
 import { AppService } from './app.service';
 import { CampaignsService } from './campaigns/campaigns.service';
 import { ContactsService } from './contacts/contacts.service';
+import { PropertiesService } from './contacts/properties/propert.service';
 import { SMSMessage } from './entities/sms-message.entity';
 import { Constants } from './enums/constants';
 import { PodioLogger } from './helpers/podio-logger';
@@ -28,7 +29,7 @@ export class AppController {
 
   private logger = new Logger(AppController.name);
 
-  constructor(private readonly appService: AppService, private campaignsService: CampaignsService, private contactsService: ContactsService, private smsService: SMSMessagesService, private phoneNumbersService: PhoneNumbersService) { }
+  constructor(private readonly appService: AppService, private campaignsService: CampaignsService, private contactsService: ContactsService, private smsService: SMSMessagesService, private phoneNumbersService: PhoneNumbersService, private propsService: PropertiesService) { }
 
   @Post('upload')
   @UseInterceptors(
@@ -201,7 +202,7 @@ export class AppController {
   @Post('podio')
   async convertAndUpload(@Req() req: Request) {
 
-  
+
     const { contactId, selectedNumberId } = req.body;
     const contact = await this.contactsService.findOne(contactId);
     const number = await this.phoneNumbersService.findOne(selectedNumberId);
@@ -226,7 +227,7 @@ export class AppController {
 
   @Get('test')
   async test() {
-    return await this.smsService.getLatestOutgoingMessages(1);
+    return await this.propsService.findAll()
   }
   @Get('hello')
   async hello() {

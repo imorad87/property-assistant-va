@@ -2,14 +2,14 @@ import { useQuery } from '@apollo/client'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import type { NextPage } from 'next'
-import  React from 'react'
+import React from 'react'
 import CampaignsDataTable from '../components/campaigns/CampaignDataTable'
 import CreateCampaignModal from '../components/campaigns/CreateCampaignModal'
 import AppLayout from '../components/layouts/AppLayout'
 import { GET_ALL_CAMPAIGNS } from '../lib/queries'
 
 
-const Home: NextPage = () => {
+const Home: NextPage = ({ count }: any) => {
 
   const { loading, error, data } = useQuery(GET_ALL_CAMPAIGNS, {
     pollInterval: 1000,
@@ -31,7 +31,7 @@ const Home: NextPage = () => {
   }
 
   React.useEffect(() => {
-    if(!loading){
+    if (!loading) {
 
       setCampaignsData(data.getAllCampaigns)
     }
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
   if (error) return <p>Error :(</p>;
 
   return (
-    <AppLayout header='Dashboard'>
+    <AppLayout header='Dashboard' count={count ? count : 0}>
       <div className="w-full mx-auto py-12">
         <div className="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
 
