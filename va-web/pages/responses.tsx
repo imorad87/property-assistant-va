@@ -5,7 +5,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { isEmpty, orderBy } from 'lodash';
-import type { NextPage } from 'next';
+import { NextPage } from 'next';
 import { Fragment, useEffect, useState } from 'react';
 import AppLayout from '../components/layouts/AppLayout';
 import NotRespondedContactsComponent from '../components/responses/NotRespondedContactsComponent';
@@ -47,7 +47,7 @@ function a11yProps(index: number) {
 
 
 
-const Responses: NextPage = ({ count, setCount }: any) => {
+const Responses: NextPage = () => {
     const [value, setValue] = useState(0);
 
     const [propertiesTabs, setPropertiesTabs] = useState<Array<any>>([]);
@@ -56,9 +56,13 @@ const Responses: NextPage = ({ count, setCount }: any) => {
 
 
 
-    const { data, loading, error } = useQuery(NOT_RESPONDED_QUERY, {
-        pollInterval: 500
-    });
+    const { data, loading, error, startPolling, stopPolling } = useQuery(NOT_RESPONDED_QUERY);
+
+
+    useEffect(() => {
+        startPolling(1000);
+        return () => stopPolling();
+    }, [startPolling, stopPolling]);
 
     function generateTabLabel(propertyData: any) {
         return (
@@ -67,7 +71,7 @@ const Responses: NextPage = ({ count, setCount }: any) => {
 
                     <Typography variant='body1'>{propertyData.address}</Typography>
 
-                    <Box sx={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', gap:1, px:2 }}>
+                    <Box sx={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', gap: 1, px: 2 }}>
                         <Typography variant='caption'><Chip size='small' label={propertyData.county} /></Typography>
                         <Typography variant='caption'><Chip size='small' label={propertyData.state} /></Typography>
                     </Box>
@@ -83,7 +87,6 @@ const Responses: NextPage = ({ count, setCount }: any) => {
 
         if (!loading && data.getNotRespondedMessages) {
             const sorted = orderBy(data.getNotRespondedMessages, ['created_at'], ['desc']);
-            setCount(sorted.length ? sorted.length : 0);
             const validProperties: any = [];
             sorted.forEach((item, i) => {
                 const property = item.phone_number.contact.property;
@@ -127,7 +130,7 @@ const Responses: NextPage = ({ count, setCount }: any) => {
 
         setPropertiesPanels(propertiesPanelsList);
 
-    }, [loading, data, value, setCount]);
+    }, [loading, data, value]);
 
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -138,7 +141,7 @@ const Responses: NextPage = ({ count, setCount }: any) => {
 
     if (loading) {
         return (
-            <AppLayout header='Recenet Responses' count={count ? count : 0}>
+            <AppLayout header='Recenet Responses'>
                 <div className="w-full mx-auto py-12">
                     <div className="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
                         <Skeleton
@@ -153,12 +156,24 @@ const Responses: NextPage = ({ count, setCount }: any) => {
         )
     }
 
+    if (!loading && isEmpty(data.getNotRespondedMessages)) {
+        return (
+            <AppLayout header='Recenet Responses'>
+
+                <Box sx={{ display: 'flex', margin: 'auto', width: '50%', height: 500, justifyContent: 'center', alignItems: 'center' }}>
+                    <Typography variant="h4" color="primary">No Recent Responses. Check back later</Typography>
+                </Box>
+
+            </AppLayout>
+        )
+    }
+
     return (
-        <AppLayout header='Recenet Responses' count={count ? count : 0}>
+        <AppLayout header='Recenet Responses'>
             <div className="w-full mx-auto py-12">
                 <div className="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
                     <Box
-                        sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: "80vh", padding: 2 }}
+                        sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: "max-content", padding: 2 }}
                     >
                         <Tabs
                             orientation="vertical"

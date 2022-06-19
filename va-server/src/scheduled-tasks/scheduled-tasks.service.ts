@@ -18,7 +18,7 @@ export class ScheduledTasksService {
         private mae: MobileAppEventsGateway
     ) { }
 
-    @Cron(CronExpression.EVERY_5_SECONDS, { name: 'getScheduledMessages' })
+    @Cron(CronExpression.EVERY_5_MINUTES, { name: 'getScheduledMessages' })
     async getScheduledMessages() {
 
         const scheduledMessages = await this.messageService.getScheduledMessages();
@@ -32,13 +32,16 @@ export class ScheduledTasksService {
                 const jobData: SMSMessage = job.data;
                 return jobData.id == message.id;
             });
-            
+
             if (match) {
                 continue;
             }
             jobs.push({
                 data: message,
                 name: 'new-message',
+                opts: {
+                    lifo: true
+                }
             });
         }
 

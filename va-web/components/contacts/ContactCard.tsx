@@ -10,11 +10,11 @@ const ContactCard = ({ contactInfo }) => {
     return (
         <Grid container direction='column' rowSpacing={2} >
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>ID</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{id}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>ID</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{ color: grey[700] }}>{id}</Typography></Grid>
             </Grid>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Active</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>Active</Typography></Grid>
                 <Grid item xs={8}>{
                     active ?
                         <Tooltip title="Active">
@@ -27,16 +27,16 @@ const ContactCard = ({ contactInfo }) => {
                 </Grid>
             </Grid>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>First Name</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{first_name}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>First Name</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{ color: grey[700] }}>{first_name}</Typography></Grid>
             </Grid>
             <Grid container item direction='row' xs={4} >
-                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Last Name</Typography></Grid>
-                <Grid item xs={8}><Typography variant="body2" style={{color:grey[700]}}>{last_name}</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>Last Name</Typography></Grid>
+                <Grid item xs={8}><Typography variant="body2" style={{ color: grey[700] }}>{last_name}</Typography></Grid>
             </Grid>
 
             <Grid container item direction='row' xs={4}>
-                <Grid item xs={4}><Typography variant="body2" style={{color:grey[700]}}>Status</Typography></Grid>
+                <Grid item xs={4}><Typography variant="body2" style={{ color: grey[700] }}>Status</Typography></Grid>
                 <Grid item xs={8}><Chip label={status} color={status === 'lead' ? 'warning' : 'success'} /></Grid>
             </Grid>
 

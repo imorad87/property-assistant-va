@@ -1,11 +1,9 @@
-import PauseCircleFilledRounded from '@mui/icons-material/PauseCircleFilledRounded';
-import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded';
 import { LinearProgress } from '@mui/material';
-import { DataGrid, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import moment from 'moment';
 import React from 'react';
 
-const CampaignsDataTable = ({ campaigns }) => {
+const CampaignsDataTable = ({ campaigns, loading }) => {
 
     const columns = React.useMemo(
         () => [
@@ -65,8 +63,9 @@ const CampaignsDataTable = ({ campaigns }) => {
     return (
         <div style={{ height: 700, width: '100%' }}>
             <DataGrid
-                rows={campaigns}
+                rows={campaigns || []}
                 columns={columns}
+                loading={loading}
                 components={{
                     Toolbar: GridToolbar,
                     LoadingOverlay: LinearProgress,

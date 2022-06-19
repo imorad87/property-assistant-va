@@ -1,7 +1,6 @@
 import { Field, GraphQLTimestamp, Int, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Contact } from "./contact.entity";
-import { PhoneNumber } from "./phone-number.entity";
 
 @ObjectType()
 @Entity()
@@ -11,28 +10,28 @@ export class Property {
     @Field(type => Int)
     id: number;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     address: string;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     type: string;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     state: string;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     apn: string;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     zip: string;
 
-    @Field()
-    @Column()
+    @Field({ nullable: true })
+    @Column({ default: null })
     county: string;
 
     @OneToMany(() => Contact, contact => contact.property, { cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })

@@ -31,6 +31,7 @@ const Contacts = () => {
         negativeResponse?: boolean,
         noConversation?: boolean,
         phoneNumber?: string,
+        campaignId?: number,
 
     }
 
@@ -45,6 +46,7 @@ const Contacts = () => {
         unknownResponse: false,
         negativeResponse: false,
         noConversation: false,
+        campaignId: 0,
     });
 
     return (

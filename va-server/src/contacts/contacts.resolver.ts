@@ -21,7 +21,7 @@ export class ContactsResolver {
     async findAll(
         @Args({ name: 'page', type: () => Int }) page: number,
         @Args({ name: 'limit', type: () => Int }) limit: number,
-        @Args({ name: 'filters', type: () => FilterStatus }) filters: FilterStatus = null,
+        @Args({ name: 'filters', type: () => FilterStatus, nullable: true }) filters: FilterStatus = null,
     ) {
         try {
             return await this.contactsService.findAll({

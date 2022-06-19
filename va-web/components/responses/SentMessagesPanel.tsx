@@ -1,9 +1,9 @@
 import { Send } from '@mui/icons-material';
-import { Container, Grid, IconButton, TextField } from '@mui/material'
+import { Grid, IconButton, TextField } from '@mui/material';
 import axios from 'axios';
-import React from 'react'
-import SingleMessageCard from './SingleMessageCard'
 import { useSnackbar } from 'notistack';
+import React from 'react';
+import SingleMessageCard from '../contacts/messages/SingleMessageCard';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

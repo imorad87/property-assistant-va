@@ -103,8 +103,8 @@ export class MobileAppEventsGateway {
       message: messageToSend.body,
     }
 
-    this.logger.log(`Sending Message To Mobile: ${JSON.stringify(message)} in 30 seconds`);
-    await new Promise(resolve => setTimeout(resolve, 20000));
+    this.logger.log(`Sending Message To Mobile: ${JSON.stringify(message)} in 10 seconds`);
+    await new Promise(resolve => setTimeout(resolve, 10000));
 
     this.server.emit('sms-send-event', message);
   }

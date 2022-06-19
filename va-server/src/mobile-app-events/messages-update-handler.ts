@@ -45,7 +45,7 @@ export class MessagesUpdateHandler {
 
             const rawNumber = from.replace('+', '');
             const asNumber = parseInt(rawNumber, 10);
-            
+
             const foundNumber = await this.phoneNumbersService.findByNumberExact(`${asNumber}`);
 
             if (foundNumber) {
@@ -62,10 +62,7 @@ export class MessagesUpdateHandler {
 
                 this.logger.log(`Received Message Classification: ${classification}`);
 
-                if (response === 'unknown') {
-                    await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.UNKNOWN_RESPONSE);
-                    return;
-                }
+
 
 
                 //create a message for the received one
@@ -101,6 +98,16 @@ export class MessagesUpdateHandler {
                     }
                 }
 
+                if (response === 'unknown') {
+                    await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.UNKNOWN_RESPONSE);
+                    return;
+                }
+
+                if (classification === 'negative') {
+                    await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.NEGATIVE_RESPONSE);
+                    return;
+                }
+
                 //create a message for the response
                 const responseMessage = await this.smsService.create({
                     body: response,
@@ -110,13 +117,7 @@ export class MessagesUpdateHandler {
                     phone_number: foundNumber.id,
                     active: foundNumber.active
                 });
-
-
-                if (classification === 'negative') {
-                    await this.phoneNumbersService.deactivateWithReason(foundNumber.id, Constants.NEGATIVE_RESPONSE);
-                }
-
-            }else{
+            } else {
                 this.logger.log('No matching mnumber for recieved message')
             }
 

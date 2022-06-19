@@ -37,12 +37,12 @@ type PhoneNumber {
 
 type Property {
   id: Int!
-  address: String!
-  type: String!
-  state: String!
-  apn: String!
-  zip: String!
-  county: String!
+  address: String
+  type: String
+  state: String
+  apn: String
+  zip: String
+  county: String
   contacts: [Contact!]!
   created_at: Timestamp!
   updated_at: Timestamp!
@@ -51,7 +51,7 @@ type Property {
 type Contact {
   id: Int!
   first_name: String!
-  last_name: String!
+  last_name: String
   active: Boolean!
   status: String!
   phone_numbers: [PhoneNumber!]!
@@ -154,7 +154,7 @@ type ContactType {
 }
 
 type Query {
-  getAllContacts(page: Int!, limit: Int!, filters: FilterStatus!): PaginationResult!
+  getAllContacts(page: Int!, limit: Int!, filters: FilterStatus): PaginationResult!
   findContact(id: Int!): Contact!
   contactsStats: ContactsStats!
   getAllPropertys: [Property!]!
@@ -173,15 +173,16 @@ type Query {
 }
 
 input FilterStatus {
-  name: String!
-  converted: Boolean!
-  leads: Boolean!
-  active: Boolean!
-  inactive: Boolean!
-  unknownResponse: Boolean!
-  negativeResponse: Boolean!
-  noConversation: Boolean!
-  phoneNumber: String!
+  name: String
+  converted: Boolean
+  leads: Boolean
+  active: Boolean
+  inactive: Boolean
+  unknownResponse: Boolean
+  negativeResponse: Boolean
+  noConversation: Boolean
+  phoneNumber: String
+  campaignId: Int
 }
 
 type Mutation {

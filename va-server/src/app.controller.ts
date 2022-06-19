@@ -227,8 +227,43 @@ export class AppController {
 
   @Get('test')
   async test() {
-    return await this.propsService.findAll()
+    try {
+      return await this.contactsService.findAll({
+        page: 1,
+        limit: 25
+      },
+        {
+          
+          unknownResponse: true,
+          // negativeResponse:false,
+
+        }
+      );
+    } catch (error) {
+      console.log(error);
+
+    }
   }
+
+  @Get('test1')
+  async test1() {
+    try {
+      return await this.contactsService.test();
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+  @Get('test2')
+  async test2() {
+    try {
+      return await this.phoneNumbersService.isDuplicate('0013059687063');
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+
   @Get('hello')
   async hello() {
     return 'Hello from docker'

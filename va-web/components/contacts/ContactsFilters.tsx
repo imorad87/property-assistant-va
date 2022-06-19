@@ -1,6 +1,8 @@
-import { Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
+import { RestoreOutlined } from '@mui/icons-material'
+import { Box, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
 import { grey } from '@mui/material/colors'
-import React, { useState } from 'react'
+import { isNumber } from 'lodash'
+import React from 'react'
 
 
 
@@ -9,17 +11,31 @@ const ContactsFilters = ({ filters, setFilters }) => {
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         setFilters(prev => ({ ...prev, [event.target.name]: checked }));
-
     }
+
     const handleTextboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+        if (event.target.name == 'campaignId' && !isNumber(event.target.value)) {
+            setFilters(prev => ({ ...prev, campaignId: parseInt(event.target.value as string) }));
+            return;
+        }
         setFilters(prev => ({ ...prev, [event.target.name]: event.target.value }));
-
     }
 
-    const Field = ({ title, name, value }) => {
-        return <TextField id={title} label={title} variant="standard" name={name} onChange={handleTextboxChange} value={value} />
+    const clearFilters = () => {
+        setFilters({
+            name: '',
+            phoneNumber: '',
+            converted: false,
+            leads: false,
+            active: false,
+            inactive: false,
+            unknownResponse: false,
+            negativeResponse: false,
+            noConversation: false,
+            campaignId: 0,
+        })
     }
-
     return (
         <Stack
             gap={2}
@@ -30,21 +46,32 @@ const ContactsFilters = ({ filters, setFilters }) => {
             sx={{ height: '100%' }}
             divider={<Divider orientation="horizontal" />}
         >
-            <Typography variant="h5" color="primary">Filters</Typography>
-            <Field title='Name' name='name' value={filters.name} />
-            <Field title='Number' name='number' value={filters.phoneNumber} />
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'space-between' }}>
+                <Typography variant="h6" color="primary">Filters</Typography>
+                <IconButton onClick={clearFilters}>
+                    <Tooltip title='CLear filters'>
+                        <RestoreOutlined color='primary' />
+                    </Tooltip>
+                </IconButton>
+            </Box>
+            <TextField id='Name' label='Name' variant="standard" name='name' onChange={handleTextboxChange} value={filters.name} />
+
+            <TextField id='phoneNumber' label='Number' variant="standard" name='phoneNumber' onChange={handleTextboxChange} value={filters.phoneNumber} />
+
+            <TextField type='number' id='campaignId' label='Campaign ID' variant="standard" name='campaignId' onChange={handleTextboxChange} value={filters.campaignId} />
+
             <FormControl component="fieldset" variant="standard">
                 <FormLabel component="legend">Contacts Status</FormLabel>
                 <FormGroup>
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="leads" />
+                            <Checkbox onChange={handleCheckboxChange} name="leads" checked={filters.leads}/>
                         }
                         label="Leads"
                     />
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="converted" />
+                            <Checkbox onChange={handleCheckboxChange} name="converted" checked={filters.converted}/>
                         }
                         label="Converted"
                     />
@@ -55,13 +82,13 @@ const ContactsFilters = ({ filters, setFilters }) => {
                 <FormGroup>
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="active" />
+                            <Checkbox onChange={handleCheckboxChange} name="active" checked={filters.active}/>
                         }
                         label="Active"
                     />
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="inactive" />
+                            <Checkbox onChange={handleCheckboxChange} name="inactive" checked={filters.inactive}/>
                         }
                         label="Inactive"
                     />
@@ -72,25 +99,24 @@ const ContactsFilters = ({ filters, setFilters }) => {
                 <FormGroup>
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="unknownResponse" />
+                            <Checkbox onChange={handleCheckboxChange} name="unknownResponse" checked={filters.unknownResponse}/>
                         }
                         label="Unknown Responses"
                     />
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="negativeResponse" />
+                            <Checkbox onChange={handleCheckboxChange} name="negativeResponse" checked={filters.negativeResponse}/>
                         }
                         label="Negative Responses"
                     />
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="noConversation" />
+                            <Checkbox onChange={handleCheckboxChange} name="noConversation" checked={filters.noConversation}/>
                         }
                         label="No Conversation"
                     />
                 </FormGroup>
             </FormControl>
-            <Button variant='outlined' sx={{ justifySelf: 'flex-end' }}>Apply</Button>
         </Stack>
     )
 }

@@ -8,12 +8,11 @@ import { useState } from 'react';
 function MyApp({ Component, pageProps }: AppProps) {
 
   const apolloClient = useApollo(pageProps.initialApolloState)
-  const [count, setCount] = useState(0);
 
   return (
     <ApolloProvider client={apolloClient}>
       <SnackbarProvider maxSnack={3}>
-        <Component {...pageProps} count={count} setCount={setCount} />
+        <Component {...pageProps}/>
       </SnackbarProvider>
     </ApolloProvider>
   );

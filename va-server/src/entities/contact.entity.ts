@@ -16,15 +16,15 @@ export class Contact {
     @Column()
     @Field()
     first_name: string;
-    
-    @Column()
-    @Field()
+
+    @Column({ default: null })
+    @Field({ nullable: true })
     last_name: string;
 
     @Field()
     @Column({ default: true })
     active: boolean;
-    
+
     @Field()
     @Column({ default: Constants.LEAD })
     status: string;
@@ -58,5 +58,5 @@ export class Contact {
     updated_at: Date;
 
 
-    
+
 }

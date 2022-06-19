@@ -12,7 +12,7 @@ const SingleMessageCard = ({ message }) => {
                     : <Chip label="Outgoing" style={{ fontSize: '0.70em', color: green[700] }} size="small" />
                 }
                 <Chip label={message.status} style={{ fontSize: '0.70em', color: blue[700] }} size="small" />
-                {message.classification && <Chip label={message.classification} style={{ fontSize: '0.70em', color: message.classification === 'negative' ? red[700] : blue[700], fontWeight: 'bold' }} size="small" />}
+                {message.classification && <Chip label={message.classification} style={{ fontSize: '0.70em', color: message.classification === 'negative' || message.classification === 'unknown'  ? red[700] : blue[700], fontWeight: 'bold' }} size="small" />}
             </Grid>
             <Grid item container justifyContent='space-between' wrap='nowrap' columnSpacing={1} alignItems='center' >
                 <Grid item flexGrow={1}>

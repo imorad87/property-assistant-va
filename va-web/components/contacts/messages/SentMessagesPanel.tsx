@@ -38,9 +38,9 @@ const SentMessagesPanel = ({ messages, numberInfo }) => {
         }
     }
     return (
-        <Grid container flexDirection='column' spacing={1} justifyContent='center' alignItems='center' height='100%'>
+        <Grid container flexDirection='column' spacing={1} justifyContent='center' alignItems='center' height='100%' flexGrow={1}>
             {/* {JSON.stringify(numberInfo)} */}
-            <Grid container item overflow='auto' >
+            <Grid container item overflow='auto' maxHeight={750}>
                 {
                     messages.map(message => {
                         if (message.status !== 'scheduled' && message.status !== 'queued' && message.status !== 'Send Failed') {

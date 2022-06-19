@@ -464,22 +464,24 @@ export class UnrespondedDataObject {
 
 @InputType()
 export class FilterStatus {
-    @Field()
+    @Field({ nullable: true })
     name?: string;
-    @Field()
+    @Field({ nullable: true })
     converted?: boolean;
-    @Field()
+    @Field({ nullable: true })
     leads?: boolean;
-    @Field()
+    @Field({ nullable: true })
     active?: boolean;
-    @Field()
-    inactive: boolean;
-    @Field()
+    @Field({ nullable: true })
+    inactive?: boolean;
+    @Field({ nullable: true })
     unknownResponse?: boolean;
-    @Field()
+    @Field({ nullable: true })
     negativeResponse?: boolean;
-    @Field()
+    @Field({ nullable: true })
     noConversation?: boolean;
-    @Field()
+    @Field({ nullable: true })
     phoneNumber?: string;
+    @Field(() => Int, { nullable: true })
+    campaignId?: number;
 }

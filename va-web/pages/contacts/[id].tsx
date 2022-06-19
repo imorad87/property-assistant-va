@@ -6,7 +6,7 @@ import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import { Grid, IconButton, Tooltip } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
-import React from 'react'
+import React, { useEffect } from 'react'
 import CampaignInfoCard from '../../components/campaigns/CampaignCard'
 import ContactCard from '../../components/contacts/ContactCard'
 import PhoneNumbersPanel from '../../components/contacts/PhoneNumbersPanel'
@@ -26,10 +26,15 @@ const Contact = () => {
 
     const { id } = router.query
 
-    const { loading, error, data } = useQuery(CONTACT_DETAIL_QUERY, {
+    const { loading, error, data, startPolling, stopPolling } = useQuery(CONTACT_DETAIL_QUERY, {
         variables: { findContactId: parseInt(id as string) },
-        pollInterval: 1000,
     });
+
+    useEffect(() => {
+        startPolling(1000);
+
+        return () => stopPolling();
+    }, [startPolling, stopPolling]);
 
     const [updateContact] = useMutation(UPDATE_CONTACT);
 
@@ -41,7 +46,7 @@ const Contact = () => {
 
     if (loading) return <div>Loading....</div>
 
-    if (!id || error || activateStatus.error || deactivateStatus.error) return <div>Something went wrong. Error.</div>
+    if (!id || error || activateStatus.error || deactivateStatus.error) return <div>{JSON.stringify(error)}</div>
 
     const pauseContact = async () => {
         const { data, errors } = await deactivateContact({
@@ -81,7 +86,7 @@ const Contact = () => {
         }
 
     }
-    
+
     const resetContact = async () => {
         const { data, errors } = await updateContact({
             variables: {

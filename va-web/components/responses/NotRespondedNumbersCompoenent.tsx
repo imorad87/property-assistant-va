@@ -1,7 +1,12 @@
-import { Box, Button, Stack, Tab, Tabs } from '@mui/material';
+import { RestartAltRounded, UploadRounded } from '@mui/icons-material';
+import { Box, Button, Grid, IconButton, Stack, Tab, Tabs, Tooltip } from '@mui/material';
 import { isEmpty } from 'lodash';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import CampaignInfoCard from '../campaigns/CampaignCard';
+import ContactCard from '../contacts/ContactCard';
 import SentMessagesPanel from '../contacts/messages/SentMessagesPanel';
+import PropertyInfoCard from '../contacts/PropertyInfoCard';
 
 function a11yProps(index: number) {
     return {
@@ -46,6 +51,15 @@ function NotRespondedNumbersCompoenent({ phoneNumbers }: any) {
     const [numbersTabs, setNumbersTabs] = useState<Array<any>>([]);
 
     const [numbersPanels, setNumbersPanels] = useState<Array<any>>([]);
+
+    const router = useRouter();
+
+    const viewContact = React.useCallback(
+        (id: number) => () => {
+            router.push(`/contacts/${id}`)
+        },
+        [router],
+    );
     useEffect(() => {
 
         const numbersTabsList: Array<any> = [];
@@ -83,7 +97,48 @@ function NotRespondedNumbersCompoenent({ phoneNumbers }: any) {
                     >
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <SentMessagesPanel messages={phoneNumber.messages} numberInfo={phoneNumber} key={i} />
-                            <Box><Button variant='outlined'>View</Button></Box>
+                            <Stack sx={{ width: 'max-content' }}>
+                                <Grid item container>
+                                    <div className="py-6 w-full">
+                                        <div className="w-full mx-auto">
+                                            <div className="bg-white overflow-hidden shadow-md sm:rounded-lg">
+                                                <div className="flex p-6 items-center justify-between bg-white border-b border-gray-200 ">
+                                                    <div className='text-gray-500 font-bold text-left w-full'>Contact Information</div>
+                                                    <Button variant='outlined' onClick={viewContact(phoneNumber.contact.id)}>View</Button>
+
+                                                </div>
+                                                <div className='p-6 bg-gray-50'>
+                                                    <ContactCard contactInfo={phoneNumber.contact} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="py-6 w-full">
+                                        <div className="w-full mx-auto">
+                                            <div className="bg-white overflow-hidden shadow-md sm:rounded-lg">
+                                                <div className="flex p-6 items-center justify-between bg-white border-b border-gray-200 ">
+                                                    <div className='text-gray-500 font-bold text-left w-full'>Property Information</div>
+                                                </div>
+                                                <div className='p-6 bg-gray-50'>
+                                                    <PropertyInfoCard propertyInfo={phoneNumber.contact.property} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className=" py-6 w-full">
+                                        <div className="w-full mx-auto">
+                                            <div className="bg-white overflow-hidden shadow-md sm:rounded-lg">
+                                                <div className="flex p-6 items-center justify-between bg-white border-b border-gray-200 ">
+                                                    <div className='text-gray-500 font-bold text-left w-full'>Campaign Information</div>
+                                                </div>
+                                                <div className='p-6 bg-gray-50'>
+                                                    <CampaignInfoCard campaignInfo={phoneNumber.contact.campaign} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Grid>
+                            </Stack>
                         </Box>
                     </TabPanel>)
             })

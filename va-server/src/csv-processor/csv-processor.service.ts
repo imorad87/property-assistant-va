@@ -1,6 +1,7 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { Job, Queue } from 'bull';
+import { includes, isEmpty } from 'lodash';
 import { Contact } from 'src/entities/contact.entity';
 import { Property } from 'src/entities/property.entity';
 import { CampaignsService } from '../campaigns/campaigns.service';
@@ -59,14 +60,26 @@ export class CSVProcessorService {
         this.count = 0;
     }
 
+    private removeDuplicates = ((numbers: Array<string>) => {
+        const validNumbers = [];
+
+        for (const number of numbers) {
+            if (!includes(validNumbers, number)) {
+                validNumbers.push(number);
+            }
+        }
+        return validNumbers;
+    });
+
 
     private async parseAndSaveRecord(record: any, constraints: ProcessingConstraints) {
+
+        console.log(record);
+
 
         const active = record.active === 'True' || record.active === 'true' || record.active === 'TRUE' ? true : false;
 
         const customMessage = constraints.customMessage;
-
-        let hasTwoOwners = false;
 
         const property = {
             address: record.property_full_address,
@@ -80,7 +93,7 @@ export class CSVProcessorService {
         const owner1: ContactRecord = {
             firstname: record.owner_1_first_name,
             lastname: record.owner_1_last_name,
-            phoneNumbers: record.owner_1_numbers.split(','),
+            phoneNumbers: record.owner_1_numbers.split('&'),
             campaignId: this.campaign.id,
         }
 
@@ -113,16 +126,25 @@ export class CSVProcessorService {
             }
         }
 
-        if (owner1 && owner2) {
-            hasTwoOwners = true;
+        if (owner1.phoneNumbers) {
+            owner1.phoneNumbers = this.removeDuplicates(owner1.phoneNumbers);
+        }
+
+        if (owner2 && owner2.phoneNumbers) {
+            owner2.phoneNumbers = this.removeDuplicates(owner2.phoneNumbers);
         }
 
         for await (const n of owner1.phoneNumbers) {
+            console.log("🚀 ~ file: csv-processor.service.ts ~ line 121 owner1.phoneNumbers before", owner1.phoneNumbers)
 
             const duplicate = await this.phoneNumbersService.isDuplicate(n);
 
+
+
+
             if (duplicate) {
                 owner1.phoneNumbers = owner1.phoneNumbers.filter(m => m != n);
+                console.log("🚀 ~ file: csv-processor.service.ts ~ line 129 ~ CSVProcessorService ~ forawait ~ owner1.phoneNumbers after", owner1.phoneNumbers)
 
                 await this.campaignsService.incrementDuplicatesCount(this.campaign.id);
             }
@@ -165,7 +187,7 @@ export class CSVProcessorService {
         let savedProperty: Property;
         let savedContact1: Contact;
 
-        if (owner1.phoneNumbers.length > 0) {
+        if (!isEmpty(owner1.phoneNumbers)) {
 
             savedProperty = await this.propertiesService.create(property);
 
@@ -176,7 +198,7 @@ export class CSVProcessorService {
 
         let savedContact2: Contact;
 
-        if (owner2 && owner2.phoneNumbers.length > 0) {
+        if (owner2 && !isEmpty(owner2.phoneNumbers)) {
             if (!savedProperty) {
                 savedProperty = await this.propertiesService.create(property);
             }
@@ -204,7 +226,7 @@ export class CSVProcessorService {
             return await this.contactsService.create(contact);
         } catch (error) {
             this.logger.error(error.message);
-            console.log(error);
+            // console.log(error);
             await this.campaignsService.incrementFailedCount(this.campaign.id);
         }
     }

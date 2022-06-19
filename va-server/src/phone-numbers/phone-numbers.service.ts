@@ -62,8 +62,9 @@ export class PhoneNumbersService {
         return (await this.phoneNumbersRepo.findOne({ where: { id }, relations: ['messages'] })).messages;
     }
 
-    async isDuplicate(number: string): Promise<boolean> {
-        return await this.phoneNumbersRepo.createQueryBuilder('numbers').where("numbers.number = :number", { number }).getCount() ? true : false;
+    async isDuplicate(input: string): Promise<boolean> {
+
+        return await this.phoneNumbersRepo.createQueryBuilder('numbers').where("numbers.number_base10 = :number", { number: `${parseInt(input.trim())}` }).getCount() ? true : false;
     }
 
     async findByNumberExact(number: string) {

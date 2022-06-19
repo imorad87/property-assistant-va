@@ -14,7 +14,7 @@ export class PhoneNumber {
     @Field()
     @Column({ unique: true })
     number: string;
-    
+
     @Field()
     @Column({ unique: true })
     number_base10: string;
@@ -47,4 +47,5 @@ export class PhoneNumber {
     @Field(type => GraphQLTimestamp)
     @UpdateDateColumn()
     updated_at: Date;
+
 }

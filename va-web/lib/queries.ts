@@ -155,11 +155,57 @@ query initialMessages {
   }
 }
 `;
+// export const NOT_RESPONDED_QUERY = gql`
+// query notResponded {
+//   getNotRespondedMessages {
+//     id
+//     created_at
+//     phone_number {
+//       id
+//       contact {
+//         id
+//         property {
+//           id
+//           address
+//           type
+//           state
+//           apn
+//           zip
+//           county
+//           contacts {
+//             id
+//             first_name
+//             last_name
+//             phone_numbers {
+//               id
+//               number
+//               messages {
+//                 id
+//                 body
+//                 status
+//                 active
+//                 type
+//                 classification
+//                 status_message
+//                 created_at
+//               }
+//               contact {
+//                 id
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+// `;
 export const NOT_RESPONDED_QUERY = gql`
 query notResponded {
   getNotRespondedMessages {
     id
     created_at
+    type
     phone_number {
       id
       contact {
@@ -174,8 +220,8 @@ query notResponded {
           county
           contacts {
             id
-            first_name
             last_name
+            first_name
             phone_numbers {
               id
               number
@@ -191,6 +237,24 @@ query notResponded {
               }
               contact {
                 id
+                active
+                status
+                first_name
+                last_name
+                campaign {
+                  id
+                  title
+                  status
+                }
+                property {
+                  id
+                  address
+                  type
+                  state
+                  apn
+                  zip
+                  county
+                }
               }
             }
           }
@@ -199,40 +263,5 @@ query notResponded {
     }
   }
 }
-`;
-// export const NOT_RESPONDED_QUERY = gql`
-// query notRespondedData {
-//   notResponded  {
-//     id
-//     address
-//     apn
-//     county
-//     state
-//     type
-//     zip
-//     contacts {
-//       id
-//       first_name
-//       last_name
-//       active
-//       status
-//       phone_numbers {
-//         id
-//         active
-//         deactivation_reason
-//         number
-//         messages {
-//           id
-//           active
-//           body
-//           classification
-//           created_at
-//           status
-//           type
-//         }
-//       }
-//     }
-//   }
-// }
 
-// `;
+`;

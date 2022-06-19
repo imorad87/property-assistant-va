@@ -1,20 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
+import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { PhoneNumber } from 'src/entities/phone-number.entity';
 import { SMSMessage } from 'src/entities/sms-message.entity';
 import { Constants } from 'src/enums/constants';
 import { InitialMessagesService } from 'src/initial-messages/initial-messages.service';
-import { ILike, Repository } from 'typeorm';
+import { Pagination, PaginationOptionsInterface } from '../paginate';
+import { Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { ContactsStats, FilterStatus, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 
 @Injectable()
 export class ContactsService {
-
-    // async searchContacts(search: string) {
-    //     // return await paginate
-    // }
 
     private logger = new Logger(ContactsService.name);
 
@@ -100,6 +97,7 @@ export class ContactsService {
     async findOne(id: number) {
         return await this.contactsRepo.findOne({ where: { id }, relations: ['property'] });
     }
+
     async getAllContacts() {
         return await this.contactsRepo
             .createQueryBuilder('contact')
@@ -108,54 +106,107 @@ export class ContactsService {
             .getMany();
     }
 
-    async findAll(options: IPaginationOptions, filters: FilterStatus) {
-        if (filters) {
-            console.log(filters);
+    async paginate(
+        options: PaginationOptionsInterface,
+    ): Promise<Pagination<Contact>> {
+        const [results, total] = await this.contactsRepo.findAndCount({
+            take: options.limit,
+            skip: options.page, // think this needs to be page * limit
 
-            const whereClauses = [];
+        });
+
+        // TODO add more tests for paginate
+
+        return new Pagination<Contact>({
+            results,
+            total,
+        });
+    }
+
+    async findAll(options: IPaginationOptions, filters: FilterStatus = null) {
+
+        const query = this.contactsRepo
+            .createQueryBuilder('contact')
+            .leftJoinAndSelect('contact.phone_numbers', 'phoneNumber')
+            .leftJoinAndSelect("phoneNumber.messages", 'message')
+
+        if (filters) {
+            // console.log(filters);
 
             if (filters.name) {
-                whereClauses.push({ first_name: ILike(`%${filters.name ? filters.name : ''}%`) })
-                // whereClauses.push({ last_name: ILike(`%${filters.name ? filters.name : ''}%`) })
+                query.where("contact.first_name like :firstname", { firstname: `%${filters.name}%` });
+
+                query.orWhere("contact.last_name like :lastname", { lastname: `%${filters.name}%` })
             }
 
-            // if (filters.converted) {
-            //     whereClauses.push({ status: Constants.CONVERTED })
-            // }
+            if (filters.converted) {
+                query.andWhere("contact.status = :converted", { converted: Constants.CONVERTED })
+            }
 
-            // if (filters.leads) {
-            //     whereClauses.push({ status: Constants.LEAD })
-            // }
+            if (filters.leads) {
+                if (filters.converted) {
+                    query.orWhere("contact.status = :lead", { lead: Constants.LEAD })
+                } else {
+                    query.andWhere("contact.status = :lead", { lead: Constants.LEAD })
+                }
+            }
 
-            // if (filters.active) {
-            //     whereClauses.push({ active: true })
-            // }
+            if (filters.active) {
+                query.andWhere("contact.active = :active", { active: true })
+            }
 
-            // if (filters.inactive) {
-            //     whereClauses.push({ active: false })
-            // }
+            if (filters.inactive) {
+                if (filters.active) {
+                    query.orWhere("contact.active = :inactive", { inactive: false })
 
-            // if (filters.phoneNumber) {
-            //     whereClauses.push({ phone_numbers: { number: ILike(`%${filters.phoneNumber}%`) } })
-            // }
+                } else {
+                    query.andWhere("contact.active = :inactive", { inactive: false })
 
-            // if (filters.negativeResponse) {
-            //     whereClauses.push({ phone_numbers: { deactivation_reason: Constants.NEGATIVE_RESPONSE } })
-            // }
+                }
+            }
 
-            // if (filters.unknownResponse) {
-            //     whereClauses.push({ phone_numbers: { deactivation_reason: Constants.UNKNOWN_RESPONSE } })
-            // }
+            if (filters.phoneNumber) {
+                query.andWhere("phoneNumber.number like :number", { number: filters.phoneNumber })
+            }
 
-            return await paginate<Contact>(this.contactsRepo, options, {
-                where: [
-                    { first_name: ILike(`%${filters.name ? filters.name : ''}%`) }
-                ],
-                order: { created_at: 'DESC' }
-            });
+            if (filters.negativeResponse) {
+                query.andWhere("phoneNumber.deactivation_reason = :negativeResponse", { negativeResponse: Constants.NEGATIVE_RESPONSE })
+            }
+
+            if (filters.unknownResponse) {
+                if (filters.negativeResponse) {
+                    query.orWhere("phoneNumber.deactivation_reason = :unknownResponse", { unknownResponse: Constants.UNKNOWN_RESPONSE })
+                } else {
+                    query.andWhere("phoneNumber.deactivation_reason = :unknownResponse", { unknownResponse: Constants.UNKNOWN_RESPONSE })
+                }
+            }
+
+            if (filters.noConversation) {
+
+            }
+
+            if (filters.campaignId) {
+                query.andWhere("contact.campaign_id = :id", { id: filters.campaignId })
+            }
         }
 
-        return await paginate<Contact>(this.contactsRepo, options);
+        const page = options.page as number;
+        const skip = (page as number) * (options.limit as number);
+
+        query
+            .skip(skip)
+            .take(options.limit as number);
+
+        return {
+            items: await query.getMany(),
+            meta: {
+                totalItems: await query.getCount(),
+                itemCount: 0,
+                itemsPerPage: options.limit as number,
+                totalPages: 0,
+                currentPage: 0
+            }
+        };
     }
 
     async update(contact: IContactUpdateObject) {
@@ -290,5 +341,24 @@ export class ContactsService {
         contact.status = Constants.CONVERTED;
         contact.active = false;
         await this.contactsRepo.save(contact);
+    }
+
+    async test() {
+
+        // const messagesIds = await this.smsRepo.createQueryBuilder('messages').select(['id']).getMany();
+
+        // return await this.contactsRepo.createQueryBuilder('contact')
+        //     .leftJoinAndSelect('contact.phone_numbers', 'phoneNumber')
+        //     .leftJoinAndSelect("phoneNumber.messages", 'messages')
+        //     .where('phoneNumber.messages.id in (:...value)', { value: messagesIds })
+        //     .getMany();
+
+        const query = this.contactsRepo.createQueryBuilder('contacts')
+            .leftJoinAndSelect('contacts.phone_numbers', 'phone_number')
+            
+            query.where('phone_number.deactivation_reason = :reason', { reason: 'unknown-response' })
+            
+
+            return await query.getMany();
     }
 }

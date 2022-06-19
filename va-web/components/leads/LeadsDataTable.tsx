@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { DataGrid, GridActionsCellItem, GridRenderCellParams, GridRowId, GridRowParams, GridSelectionModel, GridToolbarContainer } from '@mui/x-data-grid';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ACTIVATE_CONTACT, ACTIVATE_CONTACTS, DEACTIVATE_CONTACT, DEACTIVATE_CONTACTS, REMOVE_MANY_CONTACTS } from '../../lib/mutations';
 import { CONTACTS_PAGE_QUERY } from '../../lib/queries';
 import BulkSMSDialog from '../contacts/messages/BulkSMSDialog';
@@ -28,7 +28,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const [pageNumber, setPageNumber] = React.useState<number>(1);
+    const [pageNumber, setPageNumber] = React.useState<number>(0);
 
     const [totalItems, setTotalItems] = React.useState<number>(0);
 
@@ -36,78 +36,48 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
     const prevSelectionModel = React.useRef<GridSelectionModel>(selectionModel);
 
-    // const [filterValue, setFilterValue] = React.useState<string | undefined>('');
 
-
-
-    // const updateData = debounce(
-    //     async () => {
-
-    //         const res = await getContacts({
-    //             variables: {
-    //                 page: pageNumber + 1,
-    //                 limit: pageSize,
-    //                 filters
-    //             }
-    //         });
-
-    //         if (res.data.getAllContacts) {
-    //             setContacts(res.data.getAllContacts.items)
-    //             setTotalItems(res.data.getAllContacts.meta.totalItems);
-    //             setIsLoading(false);
-    //         }
-    //     }
-    //     , 500);
-    const updateData = React.useCallback(
-        async () => {
-
-            const res = await getContacts({
-                variables: {
-                    page: pageNumber + 1,
-                    limit: pageSize,
-                    filters
-                }
-            });
-
-            if (res.data.getAllContacts) {
-                setContacts(res.data.getAllContacts.items)
-                setTotalItems(res.data.getAllContacts.meta.totalItems);
-                setIsLoading(false);
-            }
-        }, [filters, getContacts, pageNumber, pageSize]);
-
-
-    const { loading, error, data } = useQuery(CONTACTS_PAGE_QUERY, {
-        pollInterval: 1000,
+    const { loading, error, data, startPolling, stopPolling } = useQuery(CONTACTS_PAGE_QUERY, {
         variables: {
-            page: pageNumber + 1,
+            page: pageNumber,
             limit: pageSize,
             filters
         }
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
+        startPolling(1000);
+        return () => stopPolling();
+    }, [startPolling, stopPolling]);
 
-        if (!loading && data) {
 
-            setContacts(data.getAllContacts.items);
-            setTotalItems(data.getAllContacts.meta.totalItems);
-            setTotalCount(data.contactsStats.allContactsCount)
-            setActiveCount(data.contactsStats.activeCount)
-            setPausedCount(data.contactsStats.pausedCount)
-            setConvertedCount(data.contactsStats.convertedCount)
-        }
-    }, []);
 
-    React.useEffect(() => {
-        (
-            async () => {
-                setIsLoading(true);
-                await updateData()
-                console.log('Subsequent refresh calls');
-            }
-        )();
-    }, [pageSize, pageNumber, filters]);
+    const updateDataCallBack = React.useCallback(
+        () => {
+            console.log('updateData called');
+
+            setIsLoading(true);
+            getContacts({
+                variables: {
+                    page: pageNumber,
+                    limit: pageSize,
+                    filters
+                }
+            })
+                .then(res => res.data)
+                .then(data => {
+                    setContacts(data.getAllContacts.items)
+                    setTotalItems(data.getAllContacts.meta.totalItems);
+                    setContacts(data.getAllContacts.items);
+                    setTotalCount(data.contactsStats.allContactsCount)
+                    setActiveCount(data.contactsStats.activeCount)
+                    setPausedCount(data.contactsStats.pausedCount)
+                    setConvertedCount(data.contactsStats.convertedCount)
+                    setIsLoading(false);
+                })
+        }, [filters, getContacts, pageNumber, pageSize, setActiveCount, setConvertedCount, setPausedCount, setTotalCount]);
+
+    const updateDataDebounced = debounce(updateDataCallBack, 1000);
 
     const [activateContacts, activateStatus] = useMutation(ACTIVATE_CONTACT);
 
@@ -119,7 +89,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
         (id: GridRowId) => () => {
             router.push(`/contacts/${id}`)
         },
-        [],
+        [router],
     );
 
     const deleteContact = React.useCallback(
@@ -132,7 +102,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
             })
             setIsLoading(false)
         },
-        [],
+        [removeContacts],
     );
 
     const pauseContact = React.useCallback(
@@ -151,7 +121,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
             setIsLoading(false)
         },
-        [],
+        [deactivateContacts],
     );
 
     const resumeContact = React.useCallback(
@@ -170,17 +140,8 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
             setIsLoading(false)
         },
-        [],
+        [activateContacts],
     );
-
-
-    // const filterChangehandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setSelectionModel([]);
-    //     prevSelectionModel.current = []
-    //     setFilterValue(e.target.value)
-    // }
-
-
 
     const columns = React.useMemo(
         () => [
@@ -211,7 +172,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
                 field: 'actions',
                 type: 'actions',
                 width: 80,
-                getActions: (params) => [
+                getActions: (params: GridRowParams) => [
                     <GridActionsCellItem
                         icon={<VisibilityOutlinedIcon color='primary' />}
                         label="View"
@@ -240,15 +201,40 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
         [viewContact, deleteContact, pauseContact, resumeContact]
     );
 
+    React.useEffect(() => {
+
+        if (!loading && data) {
+            setContacts(data.getAllContacts.items);
+            setTotalItems(data.getAllContacts.meta.totalItems);
+            setTotalCount(data.contactsStats.allContactsCount)
+            setActiveCount(data.contactsStats.activeCount)
+            setPausedCount(data.contactsStats.pausedCount)
+            setConvertedCount(data.contactsStats.convertedCount)
+        }
+    }, [data, loading, setActiveCount, setConvertedCount, setPausedCount, setTotalCount]);
+    React.useEffect(() => {
+        (
+            async () => {
+                setIsLoading(true);
+                updateDataDebounced()
+                setIsLoading(false);
+            }
+        )();
+    }, [pageSize, pageNumber, filters]);
+
     if (activateStatus.error) return <div>Submission error! {activateStatus.error.message}</div>;
     if (deactivateStatus.error) return <div>Submission error! {deactivateStatus.error.message}</div>;
+    if (error) {
+        return (<div>{JSON.stringify(error)}</div>)
+    }
+
 
     return (
 
         <div style={{ width: '100%' }}>
             <DataGrid
                 isRowSelectable={(params: GridRowParams) => params.row.status === 'lead'}
-                loading={loading || isLoading}
+                loading={loading || isLoading || activateStatus.loading || deactivateStatus.loading}
                 rows={contacts}
                 columns={columns}
                 pageSize={pageSize}
@@ -269,9 +255,6 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
                     toolbar: {
                         selectionModel,
                         setIsLoading,
-                        // filterValue,
-                        // changeHandler: filterChangehandler,
-                        // clearHandler: () => setFilterValue('')
                     }
                 }}
                 selectionModel={selectionModel}
@@ -292,9 +275,6 @@ const CustomToolbar = ({ selectionModel, changeHandler, clearHandler, setIsLoadi
                 <Grid item>
                     <BasicMenu selectedContacts={selectionModel} setIsLoading={setIsLoading} />
                 </Grid>
-                {/* <Grid item>
-                    <QuickSearchToolbar value={filterValue} clearSearch={clearHandler} onChange={changeHandler} />
-                </Grid> */}
             </Grid>
         </GridToolbarContainer>
     );
