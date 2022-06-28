@@ -1,5 +1,6 @@
 import { Field, GraphQLTimestamp, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Campaign } from "src/entities/campaign.entity";
+import { PhoneNumber } from "src/entities/phone-number.entity";
 import { Property } from "src/entities/property.entity";
 import { Contact } from "../entities/contact.entity";
 
@@ -389,9 +390,18 @@ class Links {
 }
 
 @ObjectType()
-export class PaginationResult {
+export class ContactsPaginationResult {
     @Field(type => [Contact]!)
     items: Contact[];
+    @Field(type => Meta!)
+    meta: Meta;
+    @Field(type => Links!)
+    links: Links;
+}
+@ObjectType()
+export class NumbersPaginationResult {
+    @Field(type => [PhoneNumber]!)
+    items: Array<PhoneNumber>;
     @Field(type => Meta!)
     meta: Meta;
     @Field(type => Links!)
@@ -481,7 +491,10 @@ export class FilterStatus {
     @Field({ nullable: true })
     noConversation?: boolean;
     @Field({ nullable: true })
+    noNumbers?: boolean;
+    @Field({ nullable: true })
     phoneNumber?: string;
     @Field(() => Int, { nullable: true })
     campaignId?: number;
+
 }

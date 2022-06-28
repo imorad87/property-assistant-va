@@ -18,7 +18,7 @@ export class ScheduledTasksService {
         private mae: MobileAppEventsGateway
     ) { }
 
-    @Cron(CronExpression.EVERY_5_MINUTES, { name: 'getScheduledMessages' })
+    @Cron(CronExpression.EVERY_30_SECONDS, { name: 'getScheduledMessages' })
     async getScheduledMessages() {
 
         const scheduledMessages = await this.messageService.getScheduledMessages();

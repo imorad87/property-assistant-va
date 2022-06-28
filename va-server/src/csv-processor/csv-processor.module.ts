@@ -11,6 +11,9 @@ import { CSVProcessorService } from './csv-processor.service';
   imports: [
     BullModule.registerQueue({
       name: 'csv',
+      defaultJobOptions:{
+        attempts:1
+      }
     }),
     CampaignsModule,
     ContactsModule,

@@ -7,7 +7,7 @@ import React from 'react'
 
 
 
-const ContactsFilters = ({ filters, setFilters }) => {
+const PhoneNumbersFilters = ({ filters, setFilters }) => {
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         setFilters(prev => ({ ...prev, [event.target.name]: checked }));
@@ -26,15 +26,10 @@ const ContactsFilters = ({ filters, setFilters }) => {
         setFilters({
             name: '',
             phoneNumber: '',
-            converted: false,
-            leads: false,
             active: false,
             inactive: false,
-            unknownResponse: false,
-            negativeResponse: false,
             noConversation: false,
             noNumbers: false,
-            campaignId: 0,
         })
     }
     return (
@@ -59,27 +54,10 @@ const ContactsFilters = ({ filters, setFilters }) => {
 
             <TextField id='phoneNumber' label='Number' variant="standard" name='phoneNumber' onChange={handleTextboxChange} value={filters.phoneNumber} />
 
-            <TextField type='number' id='campaignId' label='Campaign ID' variant="standard" name='campaignId' onChange={handleTextboxChange} value={filters.campaignId} />
+
 
             <FormControl component="fieldset" variant="standard">
-                <FormLabel component="legend">Contacts Status</FormLabel>
-                <FormGroup>
-                    <FormControlLabel
-                        control={
-                            <Checkbox onChange={handleCheckboxChange} name="leads" checked={filters.leads} />
-                        }
-                        label="Leads"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox onChange={handleCheckboxChange} name="converted" checked={filters.converted} />
-                        }
-                        label="Converted"
-                    />
-                </FormGroup>
-            </FormControl>
-            <FormControl component="fieldset" variant="standard">
-                <FormLabel component="legend">Contacts State</FormLabel>
+                <FormLabel component="legend">Number State</FormLabel>
                 <FormGroup>
                     <FormControlLabel
                         control={
@@ -100,31 +78,15 @@ const ContactsFilters = ({ filters, setFilters }) => {
                 <FormGroup>
                     <FormControlLabel
                         control={
-                            <Checkbox onChange={handleCheckboxChange} name="unknownResponse" checked={filters.unknownResponse} />
+                            <Checkbox onChange={handleCheckboxChange} name="noConversation" checked={filters.noConversation} />
                         }
-                        label="Unknown Responses"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox onChange={handleCheckboxChange} name="negativeResponse" checked={filters.negativeResponse} />
-                        }
-                        label="Negative Responses"
+                        label="No Conversation"
                     />
                 </FormGroup>
             </FormControl>
-            {/* <FormControl component="fieldset" variant="standard">
-                <FormLabel component="legend">Phone Numbers</FormLabel>
-                <FormGroup>
-                    <FormControlLabel
-                        control={
-                            <Checkbox onChange={handleCheckboxChange} name="noNumbers" checked={filters.noNumbers} />
-                        }
-                        label="No Numbers"
-                    />
-                </FormGroup>
-            </FormControl> */}
+
         </Stack>
     )
 }
 
-export default ContactsFilters
+export default PhoneNumbersFilters

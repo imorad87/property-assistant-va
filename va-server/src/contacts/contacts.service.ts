@@ -181,10 +181,6 @@ export class ContactsService {
                 }
             }
 
-            if (filters.noConversation) {
-
-            }
-
             if (filters.campaignId) {
                 query.andWhere("contact.campaign_id = :id", { id: filters.campaignId })
             }
@@ -345,20 +341,9 @@ export class ContactsService {
 
     async test() {
 
-        // const messagesIds = await this.smsRepo.createQueryBuilder('messages').select(['id']).getMany();
 
-        // return await this.contactsRepo.createQueryBuilder('contact')
-        //     .leftJoinAndSelect('contact.phone_numbers', 'phoneNumber')
-        //     .leftJoinAndSelect("phoneNumber.messages", 'messages')
-        //     .where('phoneNumber.messages.id in (:...value)', { value: messagesIds })
-        //     .getMany();
-
-        const query = this.contactsRepo.createQueryBuilder('contacts')
-            .leftJoinAndSelect('contacts.phone_numbers', 'phone_number')
-            
-            query.where('phone_number.deactivation_reason = :reason', { reason: 'unknown-response' })
-            
-
-            return await query.getMany();
+        return await this.phonesRepo.createQueryBuilder('phoneNumber')
+            .loadRelationCountAndMap('messagesCount', 'phoneNumber.messages')
+            .getMany();
     }
 }

@@ -74,9 +74,6 @@ export class CSVProcessorService {
 
     private async parseAndSaveRecord(record: any, constraints: ProcessingConstraints) {
 
-        console.log(record);
-
-
         const active = record.active === 'True' || record.active === 'true' || record.active === 'TRUE' ? true : false;
 
         const customMessage = constraints.customMessage;
@@ -93,7 +90,7 @@ export class CSVProcessorService {
         const owner1: ContactRecord = {
             firstname: record.owner_1_first_name,
             lastname: record.owner_1_last_name,
-            phoneNumbers: record.owner_1_numbers.split('&'),
+            phoneNumbers: !isEmpty(record.owner_1_numbers) ? record.owner_1_numbers.split('&') : [],
             campaignId: this.campaign.id,
         }
 
@@ -103,7 +100,7 @@ export class CSVProcessorService {
             owner2 = {
                 firstname: record.owner_2_first_name,
                 lastname: record.owner_2_last_name,
-                phoneNumbers: record.owner_2_numbers.split(','),
+                phoneNumbers: !isEmpty(record.owner_2_numbers) ? record.owner_2_numbers.split('&') : [],
                 campaignId: this.campaign.id,
             }
         }
@@ -135,7 +132,6 @@ export class CSVProcessorService {
         }
 
         for await (const n of owner1.phoneNumbers) {
-            console.log("🚀 ~ file: csv-processor.service.ts ~ line 121 owner1.phoneNumbers before", owner1.phoneNumbers)
 
             const duplicate = await this.phoneNumbersService.isDuplicate(n);
 
@@ -144,7 +140,6 @@ export class CSVProcessorService {
 
             if (duplicate) {
                 owner1.phoneNumbers = owner1.phoneNumbers.filter(m => m != n);
-                console.log("🚀 ~ file: csv-processor.service.ts ~ line 129 ~ CSVProcessorService ~ forawait ~ owner1.phoneNumbers after", owner1.phoneNumbers)
 
                 await this.campaignsService.incrementDuplicatesCount(this.campaign.id);
             }
@@ -206,7 +201,11 @@ export class CSVProcessorService {
             savedContact2 = await this.saveContact(owner2);
         }
 
-        if (savedContact1 || savedContact2) {
+        if (savedContact1) {
+            await this.campaignsService.incrementSuccessCount(this.campaign.id);
+        }
+
+        if (savedContact2) {
             await this.campaignsService.incrementSuccessCount(this.campaign.id);
         }
     }

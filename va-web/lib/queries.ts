@@ -155,51 +155,7 @@ query initialMessages {
   }
 }
 `;
-// export const NOT_RESPONDED_QUERY = gql`
-// query notResponded {
-//   getNotRespondedMessages {
-//     id
-//     created_at
-//     phone_number {
-//       id
-//       contact {
-//         id
-//         property {
-//           id
-//           address
-//           type
-//           state
-//           apn
-//           zip
-//           county
-//           contacts {
-//             id
-//             first_name
-//             last_name
-//             phone_numbers {
-//               id
-//               number
-//               messages {
-//                 id
-//                 body
-//                 status
-//                 active
-//                 type
-//                 classification
-//                 status_message
-//                 created_at
-//               }
-//               contact {
-//                 id
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-// `;
+
 export const NOT_RESPONDED_QUERY = gql`
 query notResponded {
   getNotRespondedMessages {
@@ -260,6 +216,42 @@ query notResponded {
           }
         }
       }
+    }
+  }
+}
+
+`;
+
+export const SEARCH_NUMBERS = gql`
+query SearchNumbers($page: Int!, $limit: Int!, $filters: FilterStatus) {
+  searchNumbers(page: $page, limit: $limit, filters: $filters) {
+    items {
+      id
+      number
+      active
+      deactivation_reason
+      contact {
+        id
+        first_name
+        last_name
+        campaign {
+          id
+          title
+        }
+      }
+      messagesCount
+      messages {
+        id
+        body
+        status
+      }
+    }
+    meta {
+      totalItems
+      itemsPerPage
+      totalPages
+      currentPage
+      itemCount
     }
   }
 }

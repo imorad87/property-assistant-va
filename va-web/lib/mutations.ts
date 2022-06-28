@@ -104,6 +104,21 @@ mutation($id: Int!){
   removeMessage(id:$id)
 }
 `;
+export const ACTIVATE_NUMBERS = gql`
+mutation Mutation($ids: [Int!]!) {
+  activateManyNumbers(ids: $ids)
+}
+`;
+export const DEACTIVATE_NUMBERS = gql`
+mutation DeactivateManyNumbers($ids: [Int!]!) {
+  deactivateManyNumbers(ids: $ids)
+}
+`;
+export const REMOVE_NUMBERS = gql`
+mutation RemoveManyNumbers($ids: [Int!]!) {
+  removeManyNumbers(ids: $ids)
+}
+`;
 
 
 

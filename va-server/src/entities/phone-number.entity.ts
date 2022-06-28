@@ -1,5 +1,5 @@
 import { Field, GraphQLTimestamp, Int, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { AfterLoad, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Contact } from "./contact.entity";
 import { SMSMessage } from "./sms-message.entity";
 
@@ -48,4 +48,12 @@ export class PhoneNumber {
     @UpdateDateColumn()
     updated_at: Date;
 
+    @Column({ select: false, default: null })
+    @Field(type => Int, { nullable: true })
+    messagesCount: number;
+
+    @AfterLoad()
+    getMessagesCount() {
+        this.messagesCount = this.messages ? this.messages.length > 0 ? this.messages.length : 0 : 0;
+    }
 }

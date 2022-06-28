@@ -18,6 +18,7 @@
     "@mui/lab": "^5.0.0-alpha.86",
     "@mui/material": "^5.8.4",
     "@mui/x-data-grid": "^5.12.2",
+    "@mui/x-data-grid-generator": "^5.12.3",
     "autosuggest-highlight": "^3.2.1",
     "axios": "^0.27.2",
     "csv-file-validator": "^1.13.1",

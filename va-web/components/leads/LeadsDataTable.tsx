@@ -5,10 +5,10 @@ import PauseCircleFilledRounded from '@mui/icons-material/PauseCircleFilledRound
 import PlayArrowRounded from '@mui/icons-material/PlayArrowRounded';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, Button, Chip, Grid, IconButton, LinearProgress, TextField } from '@mui/material';
+import { Box, Button, Chip, Grid, IconButton, LinearProgress, TextField, Tooltip } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { DataGrid, GridActionsCellItem, GridRenderCellParams, GridRowId, GridRowParams, GridSelectionModel, GridToolbarContainer } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridColumns, GridRenderCellParams, GridRowId, GridRowParams, GridSelectionModel, GridToolbarContainer } from '@mui/x-data-grid';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -16,7 +16,7 @@ import { ACTIVATE_CONTACT, ACTIVATE_CONTACTS, DEACTIVATE_CONTACT, DEACTIVATE_CON
 import { CONTACTS_PAGE_QUERY } from '../../lib/queries';
 import BulkSMSDialog from '../contacts/messages/BulkSMSDialog';
 
-const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConvertedCount, filters }) => {
+const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConvertedCount, filters, filtersActive }) => {
 
     const [getContacts] = useLazyQuery(CONTACTS_PAGE_QUERY);
 
@@ -52,30 +52,34 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
 
 
+
     const updateDataCallBack = React.useCallback(
         () => {
-            console.log('updateData called');
+            if (filtersActive) {
 
-            setIsLoading(true);
-            getContacts({
-                variables: {
-                    page: pageNumber,
-                    limit: pageSize,
-                    filters
-                }
-            })
-                .then(res => res.data)
-                .then(data => {
-                    setContacts(data.getAllContacts.items)
-                    setTotalItems(data.getAllContacts.meta.totalItems);
-                    setContacts(data.getAllContacts.items);
-                    setTotalCount(data.contactsStats.allContactsCount)
-                    setActiveCount(data.contactsStats.activeCount)
-                    setPausedCount(data.contactsStats.pausedCount)
-                    setConvertedCount(data.contactsStats.convertedCount)
-                    setIsLoading(false);
+                console.log('updateData called');
+
+                setIsLoading(true);
+                getContacts({
+                    variables: {
+                        page: pageNumber,
+                        limit: pageSize,
+                        filters
+                    }
                 })
-        }, [filters, getContacts, pageNumber, pageSize, setActiveCount, setConvertedCount, setPausedCount, setTotalCount]);
+                    .then(res => res.data)
+                    .then(data => {
+                        setContacts(data.getAllContacts.items)
+                        setTotalItems(data.getAllContacts.meta.totalItems);
+                        setContacts(data.getAllContacts.items);
+                        setTotalCount(data.contactsStats.allContactsCount)
+                        setActiveCount(data.contactsStats.activeCount)
+                        setPausedCount(data.contactsStats.pausedCount)
+                        setConvertedCount(data.contactsStats.convertedCount)
+                        setIsLoading(false);
+                    })
+            }
+        }, [filters, filtersActive, getContacts, pageNumber, pageSize, setActiveCount, setConvertedCount, setPausedCount, setTotalCount]);
 
     const updateDataDebounced = debounce(updateDataCallBack, 1000);
 
@@ -143,11 +147,11 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
         [activateContacts],
     );
 
-    const columns = React.useMemo(
+    const columns = React.useMemo<GridColumns<any>>(
         () => [
-            { field: 'id', headerName: 'ID', width: 150 },
-            { field: 'first_name', headerName: 'First Name', width: 150 },
-            { field: 'last_name', headerName: 'last Name', width: 150 },
+            { field: 'id', headerName: 'ID', width: 150, align: 'center', headerAlign: 'center' },
+            { field: 'first_name', headerName: 'First Name', width: 150, align: 'center', flex: 1, headerAlign: 'center' },
+            { field: 'last_name', headerName: 'last Name', width: 150, align: 'center', flex: 1, headerAlign: 'center' },
             {
                 field: 'active',
                 headerName: 'Status',
@@ -165,7 +169,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
                 width: 150,
                 renderCell: (params: GridRenderCellParams<string>) => (
                     <Chip label={params.row.status} color={params.row.status === 'lead' ? 'warning' : 'success'} />
-                )
+                ), align: 'center', flex: 1, headerAlign: 'center'
             },
 
             {
@@ -173,11 +177,12 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
                 type: 'actions',
                 width: 80,
                 getActions: (params: GridRowParams) => [
+
                     <GridActionsCellItem
-                        icon={<VisibilityOutlinedIcon color='primary' />}
+                        icon={<Tooltip title='View Contact'><VisibilityOutlinedIcon color='primary' /></Tooltip>}
                         label="View"
                         onClick={viewContact(params.id)}
-                        showInMenu
+                        // showInMenu
                         key='item1'
                     />,
                     <GridActionsCellItem
@@ -215,12 +220,13 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
     React.useEffect(() => {
         (
             async () => {
+                if (!filtersActive) return;
                 setIsLoading(true);
                 updateDataDebounced()
                 setIsLoading(false);
             }
         )();
-    }, [pageSize, pageNumber, filters]);
+    }, [pageSize, pageNumber, filters, filtersActive]);
 
     if (activateStatus.error) return <div>Submission error! {activateStatus.error.message}</div>;
     if (deactivateStatus.error) return <div>Submission error! {deactivateStatus.error.message}</div>;
@@ -231,7 +237,7 @@ const LeadsDataTable = ({ setTotalCount, setActiveCount, setPausedCount, setConv
 
     return (
 
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', height: 800 }}>
             <DataGrid
                 isRowSelectable={(params: GridRowParams) => params.row.status === 'lead'}
                 loading={loading || isLoading || activateStatus.loading || deactivateStatus.loading}

@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-export default function BulkSMSDialog({ selectedContacts, handleClose, open }) {
+export default function BulkSMSDialog({ selectedContacts, handleClose, open, byNumbers = false }) {
 
     const [hasPlaceholders, setHasPlaceholders] = React.useState(false);
 
@@ -65,20 +65,40 @@ export default function BulkSMSDialog({ selectedContacts, handleClose, open }) {
 
     const sendMessage = () => {
 
-        axios.post(`${apiUrl}custom-sms`, {
-            message,
-            messageActive,
-            selectedContacts
-        })
-            .then(res => res.data)
-            .then(data => {
-                enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
-                resetAll();
-                handleClose();
+        if (byNumbers) {
+            axios.post(`${apiUrl}custom-sms-to-numbers`, {
+                message,
+                messageActive,
+                selectedNumbers: selectedContacts
             })
-            .catch(err => {
-                enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
+                .then(res => res.data)
+                .then(data => {
+                    enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
+                    resetAll();
+                    handleClose();
+                })
+                .catch(err => {
+                    enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
+                })
+
+        } else if (!byNumbers) {
+
+
+            axios.post(`${apiUrl}custom-sms`, {
+                message,
+                messageActive,
+                selectedContacts
             })
+                .then(res => res.data)
+                .then(data => {
+                    enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
+                    resetAll();
+                    handleClose();
+                })
+                .catch(err => {
+                    enqueueSnackbar('Bulk SMS Sent', { variant: 'success' })
+                })
+        }
     }
 
     return (

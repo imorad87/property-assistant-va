@@ -4,7 +4,7 @@ import { Contact } from 'src/entities/contact.entity';
 import { SMSMessage } from 'src/entities/sms-message.entity';
 import { DeleteResult } from 'typeorm';
 import { PhoneNumber } from '../entities/phone-number.entity';
-import { IPhoneNumberCreateObject, IPhoneNumberUpdateObject } from '../interfaces/types';
+import { FilterStatus, IPhoneNumberCreateObject, IPhoneNumberUpdateObject, NumbersPaginationResult } from '../interfaces/types';
 import { PhoneNumbersService } from './phone-numbers.service';
 
 @Resolver(() => PhoneNumber)
@@ -13,14 +13,27 @@ export class PhoneNumbersResolver {
 
     constructor(private readonly phoneNumbersService: PhoneNumbersService) { }
 
-    @Mutation((returns) => PhoneNumber, {name:'createPhoneNumber'})
+    @Mutation((returns) => PhoneNumber, { name: 'createPhoneNumber' })
     async create(@Args('createPhoneNumberInput') createInput: IPhoneNumberCreateObject): Promise<PhoneNumber> {
         return await this.phoneNumbersService.create(createInput);
     }
 
-    @Query((returns) => [PhoneNumber], { name: 'getAllPhoneNumbers' })
-    async findAll() {
-        return await this.phoneNumbersService.findAll();
+    @Query(() => NumbersPaginationResult!, { name: 'searchNumbers' })
+    async findAll(
+        @Args({ name: 'page', type: () => Int }) page: number,
+        @Args({ name: 'limit', type: () => Int }) limit: number,
+        @Args({ name: 'filters', type: () => FilterStatus, nullable: true }) filters: FilterStatus = null,
+    ) {
+        try {
+            return await this.phoneNumbersService.findAll({
+                page,
+                limit
+            },
+                filters
+            );
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     @Query((returns) => PhoneNumber, { name: 'getPhoneNumber' })
@@ -46,5 +59,20 @@ export class PhoneNumbersResolver {
     @ResolveField('messages', returns => [SMSMessage]!, { name: 'getMessages' })
     async getMessages(@Parent() number: PhoneNumber) {
         return await this.phoneNumbersService.getMessages(number.id);
+    }
+
+    @Mutation(() => Boolean, { name: 'activateManyNumbers' })
+    async activateManyContacts(@Args({ name: 'ids', type: () => [Int!]! }) ids: number[]) {
+        return await this.phoneNumbersService.activateManyNumbers(ids);
+    }
+
+    @Mutation(() => Boolean, { name: 'deactivateManyNumbers' })
+    async deactivateManyContacts(@Args({ name: 'ids', type: () => [Int!]! }) ids: number[]) {
+        return await this.phoneNumbersService.deactivateManyNumbers(ids);
+    }
+
+    @Mutation(() => Boolean, { name: 'removeManyNumbers' })
+    async removeMany(@Args('ids', { type: () => [Int!]! }) ids: number[]) {
+        return await this.phoneNumbersService.removeMany(ids);
     }
 }

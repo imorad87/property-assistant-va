@@ -1,11 +1,10 @@
 import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Campaign } from '../entities/campaign.entity';
+import { Contact } from '../entities/contact.entity';
 import { PhoneNumber } from '../entities/phone-number.entity';
 import { Property } from '../entities/property.entity';
-import { Contact } from '../entities/contact.entity';
-import { ContactsStats, FilterStatus, IContactCreateObject, IContactUpdateObject, PaginationResult } from '../interfaces/types';
+import { ContactsPaginationResult, ContactsStats, FilterStatus, IContactCreateObject, IContactUpdateObject } from '../interfaces/types';
 import { ContactsService } from './contacts.service';
-import { Pagination } from 'nestjs-typeorm-paginate';
 
 @Resolver(of => Contact)
 export class ContactsResolver {
@@ -17,7 +16,7 @@ export class ContactsResolver {
         return await this.contactsService.create(createContactInput);
     }
 
-    @Query(() => PaginationResult!, { name: 'getAllContacts' })
+    @Query(() => ContactsPaginationResult!, { name: 'getAllContacts' })
     async findAll(
         @Args({ name: 'page', type: () => Int }) page: number,
         @Args({ name: 'limit', type: () => Int }) limit: number,

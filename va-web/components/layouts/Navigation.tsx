@@ -59,7 +59,7 @@ const Navigation = () => {
                                     active={router.pathname === '/responses'}>
                                     <span className='mr-1'> Responses</span>
                                 </NavLink>
-                                <Chip color="info" size='small' label={150} className='place-self-center'/>
+                                {/* <Chip color="info" size='small' label={150} className='place-self-center'/> */}
                             </div>
                         </div>
 

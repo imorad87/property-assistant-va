@@ -31,6 +31,7 @@ type PhoneNumber {
   messages: [SMSMessage!]!
   created_at: Timestamp!
   updated_at: Timestamp!
+  messagesCount: Int
   getContact: Contact!
   getMessages: [SMSMessage!]!
 }
@@ -107,8 +108,14 @@ type Links {
   last: String!
 }
 
-type PaginationResult {
+type ContactsPaginationResult {
   items: [Contact!]!
+  meta: Meta!
+  links: Links!
+}
+
+type NumbersPaginationResult {
+  items: [PhoneNumber!]!
   meta: Meta!
   links: Links!
 }
@@ -154,7 +161,7 @@ type ContactType {
 }
 
 type Query {
-  getAllContacts(page: Int!, limit: Int!, filters: FilterStatus): PaginationResult!
+  getAllContacts(page: Int!, limit: Int!, filters: FilterStatus): ContactsPaginationResult!
   findContact(id: Int!): Contact!
   contactsStats: ContactsStats!
   getAllPropertys: [Property!]!
@@ -165,7 +172,7 @@ type Query {
   searchInitialMessages(body: String!): [InitialMessage!]!
   getAllCampaigns: [Campaign!]!
   getCampaign(id: Int!): Campaign!
-  getAllPhoneNumbers: [PhoneNumber!]!
+  searchNumbers(page: Int!, limit: Int!, filters: FilterStatus): NumbersPaginationResult!
   getPhoneNumber(id: Int!): PhoneNumber!
   getAllMessages: [SMSMessage!]!
   getNotRespondedMessages: [SMSMessage!]!
@@ -181,6 +188,7 @@ input FilterStatus {
   unknownResponse: Boolean
   negativeResponse: Boolean
   noConversation: Boolean
+  noNumbers: Boolean
   phoneNumber: String
   campaignId: Int
 }
@@ -207,6 +215,9 @@ type Mutation {
   createPhoneNumber(createPhoneNumberInput: IPhoneNumberCreateObject!): PhoneNumber!
   updatePhoneNumber(updatePhoneNumberInput: IPhoneNumberUpdateObject!): PhoneNumber!
   removePhoneNumber(id: Int!): Boolean!
+  activateManyNumbers(ids: [Int!]!): Boolean!
+  deactivateManyNumbers(ids: [Int!]!): Boolean!
+  removeManyNumbers(ids: [Int!]!): Boolean!
   createMessage(input: ISMSMessageCreateObject!): SMSMessage!
   updateMessage(input: ISMSMessageUpdateObject!): SMSMessage!
   removeMessage(id: Int!): Boolean!

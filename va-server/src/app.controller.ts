@@ -67,6 +67,67 @@ export class AppController {
 
   }
 
+  @Post('custom-sms-to-numbers')
+  async sendCustomSmsByNumbers(@Req() req: Request) {
+    this.logger.log(`Custom SMS Request Receieved: Message[${req.body.message}] numbers[${req.body.selectedNumbers.length}] MessagesActive[${req.body.messageActive}]`)
+
+    const message: string = req.body.message;
+    const numbersIds: number[] = req.body.selectedNumbers;
+    const messageActive: boolean = req.body.messageActive;
+
+    const firstnamePlaceholder = message.includes('{firstname}');
+    const lastnamePlaceholder = message.includes('{lastname}');
+    const addressPlaceholder = message.includes('{address}');
+    const apnPlaceholder = message.includes('{apn}');
+
+    const phoneNumbers = await this.phoneNumbersService.findMany(numbersIds);
+
+    const smsList = [];
+
+    for (const phoneNumber of phoneNumbers) {
+
+      const { first_name, last_name, property } = phoneNumber.contact;
+
+      const { address, apn } = property;
+
+      let contactMessage = message;
+
+      if (firstnamePlaceholder) {
+        contactMessage = contactMessage.replace('{firstname}', first_name);
+      }
+
+      if (lastnamePlaceholder) {
+        contactMessage = contactMessage.replace('{lastname}', last_name);
+      }
+
+      if (addressPlaceholder) {
+        contactMessage = contactMessage.replace('{address}', address);
+      }
+
+      if (apnPlaceholder) {
+        contactMessage = contactMessage.replace('{apn}', apn);
+      }
+
+
+      const sms = new SMSMessage();
+
+      sms.active = messageActive;
+      sms.body = contactMessage;
+      sms.phone_number = phoneNumber;
+      sms.status = Constants.SCHEDULED;
+      sms.status_message = 'To be sent';
+      sms.type = Constants.OUTGOING;
+
+      smsList.push(sms);
+
+    }
+
+    const savedMessages = await this.smsService.createMany(smsList);
+
+    return {
+      message: 'success'
+    }
+  }
   @Post('custom-sms')
   async sendCustomSms(@Req() req: Request) {
     this.logger.log(`Custom SMS Request Receieved: Message[${req.body.message}] Contacts[${req.body.selectedContacts.length}] MessagesActive[${req.body.messageActive}]`)
@@ -133,6 +194,7 @@ export class AppController {
       message: 'success'
     }
   }
+
   @Post('custom-sms-single')
   async sendSingleCustomSms(@Req() req: Request) {
     this.logger.log(`Single Custom SMS Request Receieved: Message[${req.body.message}] Contacts[${req.body.selectedContacts.length}] MessagesActive[${req.body.messageActive}]`)
@@ -225,47 +287,49 @@ export class AppController {
   }
 
 
-  @Get('test')
-  async test() {
-    try {
-      return await this.contactsService.findAll({
-        page: 1,
-        limit: 25
-      },
-        {
-          
-          unknownResponse: true,
-          // negativeResponse:false,
+  // @Get('test')
+  // async test() {
+  //   try {
+  //     return await this.phoneNumbersService.findAll({
+  //       page: 0,
+  //       limit: 25
+  //     },
+  //       {
 
-        }
-      );
-    } catch (error) {
-      console.log(error);
+  //         noConversation: true,
+  //         // negativeResponse: false,
 
-    }
-  }
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
 
-  @Get('test1')
-  async test1() {
-    try {
-      return await this.contactsService.test();
-    } catch (error) {
-      console.log(error);
+  //   }
+  // }
 
-    }
-  }
-  @Get('test2')
-  async test2() {
-    try {
-      return await this.phoneNumbersService.isDuplicate('0013059687063');
-    } catch (error) {
-      console.log(error);
+  // @Get('test1')
+  // async test1() {
+  //   try {
+  //     return await this.phoneNumbersService.test();
+  //   } catch (error) {
+  //     console.log(error);
 
-    }
-  }
+  //   }
+  // }
+  // @Get('test2')
+  // async test2() {
+  //   try {
+  //     return await this.phoneNumbersService.isDuplicate('0013059687063');
+  //   } catch (error) {
+  //     console.log(error);
 
-  @Get('hello')
+  //   }
+  // }
+
+  @Get('ping')
   async hello() {
-    return 'Hello from docker'
+    return {
+      status: 'OK'
+    }
   }
 }
